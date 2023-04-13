@@ -14,6 +14,8 @@ class Item
       150
     when 'cup coffee'
       100
+    when 'potato chips'
+      150
     end
   end
 end
