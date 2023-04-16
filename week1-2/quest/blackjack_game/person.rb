@@ -2,13 +2,12 @@
 
 # 人のクラス
 class Person
-  # どのようなアクションを起こせるのか
-  def action
-
-  end
-
   # 手札
-  def ones_hand
+  attr_accessor :cards, :point, :way_of_calling
 
+  def initialize
+    @cards = []
+    @point = []
+    @way_of_calling = 'あなた'
   end
 end

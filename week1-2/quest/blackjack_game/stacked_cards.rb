@@ -2,14 +2,14 @@
 
 require_relative 'playing_card'
 
-# 場に出ているトランプ(山札)を表現するクラスです
+# 場に出ているトランプ(山札)を表現するクラス
 class StackedCards < PlayingCard
-  def draw
+  # 山札から1枚めくるメソッド
+  def draw_card
     return if @deck.empty?
 
-    @deck.sample
+    select_card = @deck.sample
+    @deck -= [select_card]
+    select_card
   end
 end
-
-trump = StackedCards.new
-pp trump.draw.size
