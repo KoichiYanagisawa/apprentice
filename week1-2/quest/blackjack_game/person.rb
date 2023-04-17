@@ -3,11 +3,12 @@
 # 人のクラス
 class Person
   # 手札
-  attr_accessor :cards, :point, :way_of_calling
+  attr_accessor :cards, :point, :score, :way_of_calling
 
   def initialize
     @cards = []
     @point = []
+    @score = 0
     @way_of_calling = 'あなた'
   end
 end

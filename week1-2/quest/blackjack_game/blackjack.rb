@@ -1,81 +1,126 @@
 # frozen_string_literal: true
 
+require_relative 'blackjack_rules'
 require_relative 'stacked_cards'
 require_relative 'dealer'
 require_relative 'player'
+require_relative 'speaker'
 
 # ブラックジャックのゲーム進行を司るクラス
 class Blackjack
   def initialize
+    @rules = BlackjackRules.new
     @player = Player.new
     @dealer = Dealer.new
-    @stacked_cards = StackedCards.new
+    @speaker = Speaker.new
+    stacked_cards = StackedCards.new
+    @stacked_cards = stacked_cards.deck
+    @yes_or_no = ''
   end
 
+  @speaker.speak_start
+  @rules.start(@player, @dealer)
   # 開始時のカードを2枚まで振り分けるメソッド
-  def start
-    puts 'ブラックジャックを開始します。'
-    @player.cards << @stacked_cards.draw_card
-    speak_draw_card(@player)
-    @player.cards << @stacked_cards.draw_card
-    speak_draw_card(@player)
-    @dealer.cards << @stacked_cards.draw_card
-    speak_draw_card(@dealer)
-    @dealer.cards << @stacked_cards.draw_card
-    speak_draw_card(@dealer)
-    calc_point(@dealer)
-    pp print_score(@dealer)
+  # def start
+  #   [@player, @dealer].each do |person|
+  #     (1..2).each do |count|
+  #       draw_card(person)
+  #       add_point(person)
+  #       if count == 2 && person.instance_of?(Dealer)
+  #         @speaker.second_card
+  #       else
+  #         @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+  #       end
+  #     end
+  #   end
+  # end
+
+  # カードを山札から引くメソッド
+  def draw_card(person)
+    return if @stacked_cards.empty?
+
+    select_card = @stacked_cards.sample
+    @stacked_cards -= [select_card]
+    person.cards << select_card
   end
 
-  # 引いたカードを読み上げるメソッド
-  def speak_draw_card(person, draw_additinonal_card = false)
-    case person
-    when Player
-      puts "あなたの引いたカードは#{person.cards.last[0]}の#{person.cards.last[1]}です。"
-    when Dealer
-      if person.cards.size == 2
-        puts 'ディーラーの引いた2枚目のカードはわかりません。'
-      elsif person.cards.size == 2 && draw_additinonal_card
-        puts "ディーラーの引いた2枚目のカードは#{person.cards.last[0]}の#{person.cards.last[1]}でした。"
+  # personの得点を計算する
+  def add_point(person)
+    person.point <<
+      if %w[J Q K].include?(person.cards.last[1])
+        10
+      elsif person.cards.last[1] == 'A'
+        11
       else
-        puts "ディーラーの引いたカードは#{person.cards.last[0]}の#{person.cards.last[1]}です。"
+        person.cards.last[1].to_i
       end
-    end
+    calc_score(person)
   end
 
-  # 引数で与えられたpersonの得点を計算する
-  def calc_point(person)
-    person.cards.each do |card|
-      person.point <<
-        if card & %w[J Q K]
-          p card
-          10
-        elsif card[1] == 'A'
-          1
-        else
-          card[1].to_i
-        end
-    end
-    puts person.point
-  end
-
-  # 引数で与えられたポイントを元に、得点を出力する。
-  def print_score(person)
+  # 引数で与えられたプレーヤーの得点を計算する
+  def calc_score(person)
     point = person.point
-    puts point
-    score =
-      if point.sum > 21 && point.include?(1)
+    person.score =
+      if point.sum > 21 && point.include?(11)
         point.sum - 10
       else
         point.sum
       end
-    puts "#{person.way_of_calling}の得点は#{score}です。"
   end
 
   # ゲームを進行する
-  def progressing_game
+  def progressing_game(person = @player)
+    @speaker.call_point(person.way_of_calling, person.score)
+    return unless person.score < 21
+
+    @speaker.ask_draw_card
+    @yes_or_no = gets
+    if y_or_n?
+      draw_card(@player)
+      add_point(@player)
+      @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
+      progressing_game
+    end
+  end
+
+  # ディーラーのゲームを「自動」で進行する
+  def dealer_progressing_game(person = @dealer)
+    @speaker.second_card(@dealer.cards.last) if person.cards.size == 2
+    @speaker.call_point(person.way_of_calling, person.score)
+    if (person.score < 17) && (person.score <= 21)
+      draw_card(person)
+      add_point(person)
+      @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+      dealer_progressing_game
+    end
+  end
+
+  # 勝敗を決める
+  def victory_or_defeat
+    args = [@player, @dealer]
+    arr = args.map {|arg| [arg.way_of_calling, arg.score] }
+    arr = arr.sort { |a, b| a[1] <=> b[1] }
+    result = arr.select { |inner_arr| inner_arr[1] <= 21 }
+    @speaker.declared_winner(result.last[0])
+    @speaker.end_of_game
+  end
+
+  # 入力されたのがYかNかを判断する
+  def y_or_n?
+    if @yes_or_no.include?('Y')
+      true
+    elsif @yes_or_no.include?('N')
+      false
+    else
+      raise StandardError, "Y/Nで入力してください。対象外の入力値:#{@yes_or_no}"
+    end
   end
 end
 
+# blackjack = Blackjack.new
+# blackjack.start
+# blackjack.progressing_game
+# blackjack.dealer_progressing_game
+# blackjack.victory_or_defeat
+
 blackjack = Blackjack.new
-blackjack.start
