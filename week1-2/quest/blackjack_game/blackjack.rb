@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'blackjack_rules'
 require_relative 'stacked_cards'
 require_relative 'dealer'
 require_relative 'player'
@@ -9,7 +8,6 @@ require_relative 'speaker'
 # ブラックジャックのゲーム進行を司るクラス
 class Blackjack
   def initialize
-    @rules = BlackjackRules.new
     @player = Player.new
     @dealer = Dealer.new
     @speaker = Speaker.new
@@ -18,22 +16,21 @@ class Blackjack
     @yes_or_no = ''
   end
 
-  @speaker.speak_start
-  @rules.start(@player, @dealer)
   # 開始時のカードを2枚まで振り分けるメソッド
-  # def start
-  #   [@player, @dealer].each do |person|
-  #     (1..2).each do |count|
-  #       draw_card(person)
-  #       add_point(person)
-  #       if count == 2 && person.instance_of?(Dealer)
-  #         @speaker.second_card
-  #       else
-  #         @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
-  #       end
-  #     end
-  #   end
-  # end
+  def start
+    @speaker.speak_start
+    [@player, @dealer].each do |person|
+      (1..2).each do |count|
+        draw_card(person)
+        add_point(person)
+        if count == 2 && person.instance_of?(Dealer)
+          @speaker.second_card
+        else
+          @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+        end
+      end
+    end
+  end
 
   # カードを山札から引くメソッド
   def draw_card(person)
@@ -117,10 +114,8 @@ class Blackjack
   end
 end
 
-# blackjack = Blackjack.new
-# blackjack.start
-# blackjack.progressing_game
-# blackjack.dealer_progressing_game
-# blackjack.victory_or_defeat
-
 blackjack = Blackjack.new
+blackjack.start
+blackjack.progressing_game
+blackjack.dealer_progressing_game
+blackjack.victory_or_defeat
