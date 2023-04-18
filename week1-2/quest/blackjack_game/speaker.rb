@@ -13,9 +13,10 @@ class Speaker
   end
 
   # ディーラーが引いた2枚目のカードを読み上げるメソッド
-  def second_card(array_card = [])
+  def second_card(array_card = [], score = 0)
     if array_card.size == 2
       puts "ディーラーの引いた2枚目のカードは#{array_card[0]}の#{array_card[1]}でした。"
+      puts "ディーラーの現在の得点は#{score}です。"
     else
       puts 'ディーラーの引いた2枚目のカードはわかりません。'
     end
@@ -27,8 +28,8 @@ class Speaker
   end
 
   # カードを引くか聞くメソッド
-  def ask_draw_card
-    puts 'カードを引きますか?(Y/N)'
+  def ask_draw_card(name, score)
+    puts "#{name}の現在の得点は#{score}です。カードを引きますか?(Y/N)"
   end
 
   # 引き分けを宣言するメソッド

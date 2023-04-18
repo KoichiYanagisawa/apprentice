@@ -17,7 +17,7 @@ class Blackjack
   end
 
   # 開始時のカードを2枚まで振り分けるメソッド
-  def start
+  def give_out_two_card
     @speaker.speak_start
     [@player, @dealer].each do |person|
       (1..2).each do |count|
@@ -65,27 +65,38 @@ class Blackjack
       end
   end
 
-  # ゲームを進行する
-  def progressing_game(person = @player)
-    @speaker.call_point(person.way_of_calling, person.score)
+  # プレイヤーのゲームを進行する
+  def player_progressing_game(person = @player)
+    # @speaker.call_point(person.way_of_calling, person.score)
     return unless person.score < 21
 
-    @speaker.ask_draw_card
-    @yes_or_no = gets
+    @speaker.ask_draw_card(person.way_of_calling, person.score)
+    @yes_or_no = gets.upcase
     return unless y_or_n?
 
     draw_card(@player)
     add_point(@player)
     @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
-    progressing_game
+    player_progressing_game
+  end
+
+  # 入力されたのがYかNかを判断する
+  def y_or_n?
+    if @yes_or_no.include?('Y')
+      true
+    elsif @yes_or_no.include?('N')
+      false
+    else
+      raise StandardError, "Y/Nで入力してください。対象外の入力値:#{@yes_or_no}"
+    end
   end
 
   # ディーラーのゲームを「自動」で進行する
   def dealer_progressing_game(person = @dealer)
-    @speaker.second_card(@dealer.cards.last) if person.cards.size == 2
+    @speaker.second_card(person.cards.last, person.score) if person.cards.size == 2
     return if @player.score > 21
 
-    @speaker.call_point(person.way_of_calling, person.score)
+    # @speaker.call_point(person.way_of_calling, person.score)
     return unless (person.score < 17) && (person.score <= 21)
 
     draw_card(person)
@@ -99,6 +110,7 @@ class Blackjack
     args = [@player, @dealer]
     arr = args.map { |arg| [arg.way_of_calling, arg.score] }
     arr = arr.sort { |a, b| a[1] <=> b[1] }
+    arr.each { |inner_arr| @speaker.call_point(inner_arr[0], inner_arr[1]) }
     result = arr.select { |inner_arr| inner_arr[1] <= 21 }
     if result.size == 2 && result[-1][1] == result[-2][1]
       @speaker.draw_geme
@@ -107,21 +119,10 @@ class Blackjack
     end
     @speaker.end_of_game
   end
-
-  # 入力されたのがYかNかを判断する
-  def y_or_n?
-    if @yes_or_no.include?('Y')
-      true
-    elsif @yes_or_no.include?('N')
-      false
-    else
-      raise StandardError, "Y/Nで入力してください。対象外の入力値:#{@yes_or_no}"
-    end
-  end
 end
 
 blackjack = Blackjack.new
-blackjack.start
-blackjack.progressing_game
+blackjack.give_out_two_card
+blackjack.player_progressing_game
 blackjack.dealer_progressing_game
 blackjack.victory_or_defeat
