@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'stacked_cards'
+require_relative 'playing_card'
 require_relative 'dealer'
 require_relative 'player'
 require_relative 'speaker'
@@ -11,7 +11,7 @@ class Blackjack
     @player = Player.new
     @dealer = Dealer.new
     @speaker = Speaker.new
-    stacked_cards = StackedCards.new
+    stacked_cards = PlayingCard.new
     @stacked_cards = stacked_cards.deck
     @yes_or_no = ''
   end
@@ -72,33 +72,39 @@ class Blackjack
 
     @speaker.ask_draw_card
     @yes_or_no = gets
-    if y_or_n?
-      draw_card(@player)
-      add_point(@player)
-      @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
-      progressing_game
-    end
+    return unless y_or_n?
+
+    draw_card(@player)
+    add_point(@player)
+    @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
+    progressing_game
   end
 
   # ディーラーのゲームを「自動」で進行する
   def dealer_progressing_game(person = @dealer)
     @speaker.second_card(@dealer.cards.last) if person.cards.size == 2
+    return if @player.score > 21
+
     @speaker.call_point(person.way_of_calling, person.score)
-    if (person.score < 17) && (person.score <= 21)
-      draw_card(person)
-      add_point(person)
-      @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
-      dealer_progressing_game
-    end
+    return unless (person.score < 17) && (person.score <= 21)
+
+    draw_card(person)
+    add_point(person)
+    @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+    dealer_progressing_game
   end
 
   # 勝敗を決める
   def victory_or_defeat
     args = [@player, @dealer]
-    arr = args.map {|arg| [arg.way_of_calling, arg.score] }
+    arr = args.map { |arg| [arg.way_of_calling, arg.score] }
     arr = arr.sort { |a, b| a[1] <=> b[1] }
     result = arr.select { |inner_arr| inner_arr[1] <= 21 }
-    @speaker.declared_winner(result.last[0])
+    if result.size == 2 && result[-1][1] == result[-2][1]
+      @speaker.draw_geme
+    else
+      @speaker.declared_winner(result.last[0])
+    end
     @speaker.end_of_game
   end
 
