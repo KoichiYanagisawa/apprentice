@@ -34,7 +34,7 @@ class Speaker
 
   # 引き分けを宣言するメソッド
   def draw_geme
-    puts "引き分け！！！"
+    puts '引き分け！！！'
   end
 
   # 勝者を宣言するメソッド
