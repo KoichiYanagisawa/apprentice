@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# トランプを表現するクラスです
+# デッキを表現するクラスです
 class PlayingCard
   attr_reader :deck
 

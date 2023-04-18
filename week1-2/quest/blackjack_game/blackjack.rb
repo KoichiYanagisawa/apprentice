@@ -16,10 +16,10 @@ class Blackjack
     @yes_or_no = ''
   end
 
-  # 開始時のカードを2枚まで振り分けるメソッド
-  def give_out_two_card
+  # 開始状態を作るメソッド
+  def give_out_two_card(*args)
     @speaker.speak_start
-    [@player, @dealer].each do |person|
+    args.each do |person|
       (1..2).each do |count|
         draw_card(person)
         add_point(person)
@@ -41,7 +41,7 @@ class Blackjack
     person.cards << select_card
   end
 
-  # personの得点を計算する
+  # トランプの1~13に対応したポイントを加算する
   def add_point(person)
     person.point <<
       if %w[J Q K].include?(person.cards.last[1])
@@ -54,7 +54,7 @@ class Blackjack
     calc_score(person)
   end
 
-  # 引数で与えられたプレーヤーの得点を計算する
+  # 引数で与えられたポイントを得点として計算する
   def calc_score(person)
     point = person.point
     person.score =
@@ -66,8 +66,7 @@ class Blackjack
   end
 
   # プレイヤーのゲームを進行する
-  def player_progressing_game(person = @player)
-    # @speaker.call_point(person.way_of_calling, person.score)
+  def player_progressing_game(person)
     return unless person.score < 21
 
     @speaker.ask_draw_card(person.way_of_calling, person.score)
@@ -77,7 +76,7 @@ class Blackjack
     draw_card(@player)
     add_point(@player)
     @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
-    player_progressing_game
+    player_progressing_game(person)
   end
 
   # 入力されたのがYかNかを判断する
@@ -92,7 +91,7 @@ class Blackjack
   end
 
   # ディーラーのゲームを「自動」で進行する
-  def dealer_progressing_game(person = @dealer)
+  def dealer_progressing_game(person)
     @speaker.second_card(person.cards.last, person.score) if person.cards.size == 2
     return if @player.score > 21
 
@@ -102,12 +101,11 @@ class Blackjack
     draw_card(person)
     add_point(person)
     @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
-    dealer_progressing_game
+    dealer_progressing_game(person)
   end
 
   # 勝敗を決める
-  def victory_or_defeat
-    args = [@player, @dealer]
+  def victory_or_defeat(*args)
     arr = args.map { |arg| [arg.way_of_calling, arg.score] }
     arr = arr.sort { |a, b| a[1] <=> b[1] }
     arr.each { |inner_arr| @speaker.call_point(inner_arr[0], inner_arr[1]) }
@@ -119,10 +117,15 @@ class Blackjack
     end
     @speaker.end_of_game
   end
+
+  # ゲームをプレイする
+  def play
+    give_out_two_card(@player, @dealer)
+    player_progressing_game(@player)
+    dealer_progressing_game(@dealer)
+    victory_or_defeat(@player, @dealer)
+  end
 end
 
 blackjack = Blackjack.new
-blackjack.give_out_two_card
-blackjack.player_progressing_game
-blackjack.dealer_progressing_game
-blackjack.victory_or_defeat
+blackjack.play
