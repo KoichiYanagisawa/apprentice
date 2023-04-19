@@ -9,7 +9,7 @@ require_relative 'speaker'
 class Blackjack
   def initialize
     @player = Player.new
-    @dealer = Dealer.new
+    @dealer = Dealer.new({ way_of_calling: 'ディーラー' })
     @speaker = Speaker.new
     stacked_cards = PlayingCard.new
     @stacked_cards = stacked_cards.deck

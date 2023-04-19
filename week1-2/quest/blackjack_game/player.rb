@@ -1,15 +1,18 @@
 # frozen_string_literal: true
 
-# 人のクラス
+# プレイヤークラス
 class Player
-  # 手札
   attr_accessor :cards, :point, :score
   attr_reader :way_of_calling
 
-  def initialize
-    @cards = []
-    @point = []
-    @score = 0
-    @way_of_calling = 'あなた'
+  def initialize(args = {})
+    @cards = args[:cards] || []
+    @point = args[:point] || []
+    @score = args[:score] || 0
+    @way_of_calling = args[:way_of_calling] || default_way_of_calling
+  end
+
+  def default_way_of_calling
+    'あなた'
   end
 end
