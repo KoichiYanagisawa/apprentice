@@ -9,10 +9,9 @@ require_relative 'speaker'
 class Blackjack
   def initialize
     @player = Player.new
-    @dealer = Dealer.new({ way_of_calling: 'ディーラー' })
+    @dealer = Dealer.new
     @speaker = Speaker.new
-    stacked_cards = PlayingCard.new
-    @stacked_cards = stacked_cards.deck
+    @deck = PlayingCard.new.deck
     @yes_or_no = ''
   end
 
@@ -26,7 +25,7 @@ class Blackjack
         if count == 2 && person.instance_of?(Dealer)
           @speaker.second_card
         else
-          @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+          @speaker.speak_draw_card(person)
         end
       end
     end
@@ -34,10 +33,10 @@ class Blackjack
 
   # カードを山札から引くメソッド
   def draw_card(person)
-    return if @stacked_cards.empty?
+    return if @deck.empty?
 
-    select_card = @stacked_cards.sample
-    @stacked_cards -= [select_card]
+    select_card = @deck.sample
+    @deck -= [select_card]
     person.cards << select_card
   end
 
@@ -69,13 +68,13 @@ class Blackjack
   def player_progressing_game(person)
     return unless person.score < 21
 
-    @speaker.ask_draw_card(person.way_of_calling, person.score)
+    @speaker.ask_draw_card(person)
     @yes_or_no = gets.upcase
     return unless y_or_n?
 
     draw_card(@player)
     add_point(@player)
-    @speaker.speak_draw_card(@player.way_of_calling, @player.cards.last)
+    @speaker.speak_draw_card(person)
     player_progressing_game(person)
   end
 
@@ -92,15 +91,14 @@ class Blackjack
 
   # ディーラーのゲームを「自動」で進行する
   def dealer_progressing_game(person)
-    @speaker.second_card(person.cards.last, person.score) if person.cards.size == 2
+    @speaker.second_card(person) if person.cards.size == 2
     return if @player.score > 21
 
-    # @speaker.call_point(person.way_of_calling, person.score)
     return unless (person.score < 17) && (person.score <= 21)
 
     draw_card(person)
     add_point(person)
-    @speaker.speak_draw_card(person.way_of_calling, person.cards.last)
+    @speaker.speak_draw_card(person)
     dealer_progressing_game(person)
   end
 

@@ -12,6 +12,7 @@ class Player
     @way_of_calling = args[:way_of_calling] || default_way_of_calling
   end
 
+  # デフォルトの呼ばれ方をここで指定
   def default_way_of_calling
     'あなた'
   end

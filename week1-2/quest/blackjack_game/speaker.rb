@@ -8,15 +8,15 @@ class Speaker
   end
 
   # 引いたカードの内容を読み上げるメソッド
-  def speak_draw_card(player_name, array_card)
-    puts "#{player_name}の引いたカードは#{array_card[0]}の#{array_card[1]}です。"
+  def speak_draw_card(person)
+    puts "#{person.way_of_calling}の引いたカードは#{person.cards.last[0]}の#{person.cards.last[1]}です。"
   end
 
   # ディーラーが引いた2枚目のカードを読み上げるメソッド
-  def second_card(array_card = [], score = 0)
-    if array_card.size == 2
-      puts "ディーラーの引いた2枚目のカードは#{array_card[0]}の#{array_card[1]}でした。"
-      puts "ディーラーの現在の得点は#{score}です。"
+  def second_card(person = nil)
+    if !person.nil? && person.cards.last.size == 2
+      puts "ディーラーの引いた2枚目のカードは#{person.cards.last[0]}の#{person.cards.last[1]}でした。"
+      puts "ディーラーの現在の得点は#{person.score}です。"
     else
       puts 'ディーラーの引いた2枚目のカードはわかりません。'
     end
@@ -28,8 +28,8 @@ class Speaker
   end
 
   # カードを引くか聞くメソッド
-  def ask_draw_card(name, score)
-    puts "#{name}の現在の得点は#{score}です。カードを引きますか?(Y/N)"
+  def ask_draw_card(person)
+    puts "#{person.way_of_calling}の現在の得点は#{person.score}です。カードを引きますか?(Y/N)"
   end
 
   # 引き分けを宣言するメソッド
