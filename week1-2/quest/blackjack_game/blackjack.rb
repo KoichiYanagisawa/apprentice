@@ -5,7 +5,7 @@ require_relative 'dealer'
 require_relative 'player'
 require_relative 'speaker'
 
-# ブラックジャックのゲーム進行を司るクラス
+# ブラックジャックゲームを司るクラス
 class Blackjack
   def initialize
     @player = Player.new
@@ -15,23 +15,19 @@ class Blackjack
     @yes_or_no = ''
   end
 
-  # 開始状態を作るメソッド
+  # 開始状態を作る
   def give_out_two_card(*args)
     @speaker.speak_start
     args.each do |person|
-      (1..2).each do |count|
+      2.times do
         draw_card(person)
         add_point(person)
-        if count == 2 && person.instance_of?(Dealer)
-          @speaker.second_card
-        else
-          @speaker.speak_draw_card(person)
-        end
+        @speaker.speak_draw_card(person)
       end
     end
   end
 
-  # カードを山札から引くメソッド
+  # カードを山札から引く
   def draw_card(person)
     return if @deck.empty?
 
@@ -104,14 +100,14 @@ class Blackjack
 
   # 勝敗を決める
   def victory_or_defeat(*args)
-    arr = args.map { |arg| [arg.way_of_calling, arg.score] }
-    arr = arr.sort { |a, b| a[1] <=> b[1] }
-    arr.each { |inner_arr| @speaker.call_point(inner_arr[0], inner_arr[1]) }
-    result = arr.select { |inner_arr| inner_arr[1] <= 21 }
-    if result.size == 2 && result[-1][1] == result[-2][1]
-      @speaker.draw_geme
+    sorted_instances = args.sort_by(&:score)
+    sorted_instances.each { |person| @speaker.call_point(person) }
+    sorted_instances.select { |person| person.score <= 21 }
+    max_score = sorted_instances.group_by(&:score).max.last
+    if max_score.size >= 2
+      @speaker.draw_game
     else
-      @speaker.declared_winner(result.last[0])
+      @speaker.declared_winner(max_score[0])
     end
     @speaker.end_of_game
   end
