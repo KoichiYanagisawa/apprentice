@@ -11,7 +11,7 @@ class Blackjack
     @player = Player.new
     @dealer = Dealer.new
     @speaker = Speaker.new
-    @deck = PlayingCard.new.deck
+    @deck = PlayingCard.new.shuffle
     @yes_or_no = ''
   end
 
@@ -31,7 +31,7 @@ class Blackjack
   def draw_card(person)
     return if @deck.empty?
 
-    select_card = @deck.sample
+    select_card = @deck[-1]
     @deck -= [select_card]
     person.cards << select_card
   end
@@ -102,8 +102,8 @@ class Blackjack
   def victory_or_defeat(*args)
     sorted_instances = args.sort_by(&:score)
     sorted_instances.each { |person| @speaker.call_point(person) }
-    sorted_instances.select { |person| person.score <= 21 }
-    max_score = sorted_instances.group_by(&:score).max.last
+    sorted_score = sorted_instances.select { |person| person.score <= 21 }
+    max_score = sorted_score.group_by(&:score).max.last
     if max_score.size >= 2
       @speaker.draw_game
     else
