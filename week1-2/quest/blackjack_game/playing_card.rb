@@ -15,4 +15,9 @@ class PlayingCard
       end
     end
   end
+
+  # シャッフルする
+  def shuffle
+    @deck.shuffle
+  end
 end
