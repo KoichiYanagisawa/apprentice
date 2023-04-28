@@ -1,5 +1,5 @@
 #!/bin/bash
-
+PASS="$GPG_PASSPHRASE"
 FILE=./password_manager
 while true
 do
@@ -11,13 +11,13 @@ do
 			read -p "ユーザー名を入力してください:" username
 			read -p "パスワードを入力してください:" password
 			if [ -e "${FILE}.gpg" ]; then
-				gpg "${FILE}.gpg"
+				gpg -q --batch --output "$FILE" --decrypt --passphrase "$PASS" "${FILE}.gpg"
 				rm "${FILE}.gpg"
 			else
 				touch $FILE
 			fi
 			echo "$service:$username:$password" >> $FILE
-			gpg --symmetric $FILE
+		       	gpg -c --batch --passphrase $PASS $FILE
 			rm $FILE
 			echo "パスワードの追加は成功しました。"
 			;;
@@ -27,7 +27,7 @@ do
 				continue
 			fi
 			read -p "サービス名を入力してください:" service_name
-			gpg -q --output $FILE --decrypt "${FILE}.gpg"
+			gpg -q --batch --output $FILE --decrypt --passphrase $PASS "${FILE}.gpg"
 			result=$( grep "^$service_name:" $FILE )
 			rm $FILE
 			if [ -z $result ]; then
