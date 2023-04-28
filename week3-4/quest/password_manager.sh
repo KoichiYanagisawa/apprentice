@@ -28,7 +28,7 @@ do
 			fi
 			read -p "サービス名を入力してください:" service_name
 			gpg -q --output $FILE --decrypt "${FILE}.gpg"
-			result=$( grep $service_name $FILE )
+			result=$( grep "^$service_name:" $FILE )
 			rm $FILE
 			if [ -z $result ]; then
 				echo "そのサービス名は登録されていません。"
