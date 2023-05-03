@@ -1,0 +1,71 @@
+
+■7-2　非スカラ値（第1正規形未満）
+
+--配列型で「扶養者」テーブルを作成するSQL 文
+DROP TABLE huyoshaAR;
+CREATE TABLE huyoshaAR (
+    shain_id  varchar(4),     
+    shain_mei varchar(20),     
+    kodomo    varchar(20)[],  
+    PRIMARY KEY(shain_id));
+
+DELETE FROM huyoshaAR;
+INSERT INTO huyoshaAR VALUES ('000A',	'加藤',	'{達夫, 信二}');
+INSERT INTO huyoshaAR VALUES ('000B',	'藤本',	NULL);
+INSERT INTO huyoshaAR VALUES ('001F',	'三島',	'{敦, 陽子, 清美}');
+COMMIT;
+
+
+SELECT 会社.会社名,
+       社員.社員名
+ FROM 社員 INNER JOIN 会社
+   ON 社員.会社コード = 会社.会社コード
+WHERE 社員.社員名 = '田島';
+
+
+■7-7　ダブルマスタ
+
+--顧客マスタA
+DROP TABLE CustomersA;
+CREATE TABLE CustomersA (
+    customer_cd   char(4),
+    customer_name varchar(16),
+    PRIMARY KEY(customer_cd));
+
+DELETE FROM CustomersA;
+INSERT INTO CustomersA VALUES ('C001', '山田　太郎');
+INSERT INTO CustomersA VALUES ('C002', '中島　義人');
+INSERT INTO CustomersA VALUES ('C003', '新藤　啓太');
+INSERT INTO CustomersA VALUES ('C004', '中村　佳織');
+COMMIT;
+
+
+--顧客マスタB
+DROP TABLE CustomersB;
+CREATE TABLE CustomersB (
+    customer_cd   char(4),
+    customer_name varchar(16),
+    PRIMARY KEY(customer_cd));
+
+DELETE FROM CustomersB;
+INSERT INTO CustomersB VALUES ('C001', '山田　太郎');
+INSERT INTO CustomersB VALUES ('C002', '中島　義人');
+INSERT INTO CustomersB VALUES ('C003', '新藤　啓太');
+INSERT INTO CustomersB VALUES ('K001', '小嶋　雅夫');
+COMMIT;
+
+--完全外部結合の例
+SELECT COALESCE(A.customer_cd, B.customer_cd),
+       COALESCE(A.customer_name, B.customer_name)
+  FROM CustomersA A FULL OUTER JOIN CustomersB B
+    ON A.customer_cd = B.customer_cd;
+
+
+--UNION の例
+SELECT A.customer_cd,
+       A.customer_name
+  FROM CustomersA A
+UNION
+SELECT B.customer_cd,
+       B.customer_name
+  FROM CustomersB B;

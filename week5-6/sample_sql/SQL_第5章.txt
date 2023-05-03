@@ -1,0 +1,154 @@
+■5-1 正規化の功罪
+
+--非正規化（内部結合を使うケース）
+SELECT Kaisha_NF3.kaisha_mei,
+       Shain_NF3.shain_mei
+  FROM Shain_NF3 INNER JOIN Kaisha_NF3
+    ON Shain_NF3.kaisha_cd = Kaisha_NF3.kaisha_cd
+ WHERE Shain_NF3.shain_mei = '田島';
+
+SELECT Kaisha_NF3.kaisha_mei,
+       Shain_NF3.shain_mei,
+       Busho_NF3.busho_mei
+  FROM Shain_NF3 INNER JOIN Kaisha_NF3
+    ON Shain_NF3.kaisha_cd = Kaisha_NF3.kaisha_cd
+         INNER JOIN Busho_NF3
+            ON Shain_NF3.busho_cd = Busho_NF3.busho_cd
+ WHERE Shain_NF3.shain_mei = '田島';
+
+
+
+--非正規化（外部結合を使うケース）
+SELECT Kaisha_NF3.kaisha_cd,
+       COUNT(Shain_NF3.shain_mei) AS shain_su
+  FROM Kaisha_NF3 LEFT OUTER JOIN Shain_NF3
+    ON Shain_NF3.kaisha_cd = Kaisha_NF3.kaisha_cd
+ GROUP BY Kaisha_NF3.kaisha_cd;
+
+
+
+■5-2 非正規化とパフォーマンス
+
+--受注
+DROP TABLE Orders;
+CREATE TABLE Orders
+ (order_id   CHAR(4),
+  order_date DATE,
+  order_name VARCHAR(16),
+    PRIMARY KEY(order_id)); 
+
+DELETE FROM Orders;
+INSERT INTO Orders VALUES ('0001', '2012-01-05', '岡野　徹');
+INSERT INTO Orders VALUES ('0002', '2012-01-05', '浜田　健一');
+INSERT INTO Orders VALUES ('0003', '2012-01-06', '石井　慶子');
+INSERT INTO Orders VALUES ('0004', '2012-01-07', '若山　みどり');
+INSERT INTO Orders VALUES ('0005', '2012-01-07', '庄野　弘一');
+INSERT INTO Orders VALUES ('0006', '2012-01-11', '若山　みどり');
+INSERT INTO Orders VALUES ('0007', '2012-01-12', '岡野　徹');
+COMMIT;
+
+
+DROP TABLE OrderDetails;
+CREATE TABLE OrderDetails
+ (order_id   CHAR(4),
+  seq        INTEGER,
+  item_name  VARCHAR(16),
+    PRIMARY KEY(order_id, seq)); 
+
+
+DELETE FROM OrderDetails;
+INSERT INTO OrderDetails VALUES ('0001', 1, 'マカロン');
+INSERT INTO OrderDetails VALUES ('0001', 2, '紅茶');
+INSERT INTO OrderDetails VALUES ('0001', 3, 'オリーブオイル');
+INSERT INTO OrderDetails VALUES ('0001', 4, 'チョコ詰め合わせ');
+INSERT INTO OrderDetails VALUES ('0002', 1, '紅茶');
+INSERT INTO OrderDetails VALUES ('0002', 2, '日本茶');
+INSERT INTO OrderDetails VALUES ('0002', 3, 'ティーポット');
+INSERT INTO OrderDetails VALUES ('0003', 1, '米');
+INSERT INTO OrderDetails VALUES ('0004', 1, 'アイロン');
+INSERT INTO OrderDetails VALUES ('0004', 2, 'ネクタイ');
+INSERT INTO OrderDetails VALUES ('0005', 1, 'チョコ詰め合わせ');
+INSERT INTO OrderDetails VALUES ('0005', 2, '紅茶');
+INSERT INTO OrderDetails VALUES ('0005', 3, 'クッキーセット');
+INSERT INTO OrderDetails VALUES ('0006', 1, '牛肉');
+INSERT INTO OrderDetails VALUES ('0006', 2, '鍋セット');
+INSERT INTO OrderDetails VALUES ('0007', 1, '米');
+COMMIT;
+
+--商品数を求める
+SELECT Orders.order_date,
+       COUNT(*) AS item_cnt
+  FROM Orders INNER JOIN OrderDetails
+    ON Orders.order_id = OrderDetails.order_id
+ GROUP BY Orders.order_date;
+
+
+--受注（商品数の列を追加）
+DROP TABLE Orders2;
+CREATE TABLE Orders2
+ (order_id   CHAR(4),
+  order_date DATE,
+  order_name VARCHAR(16),
+  item_cnt   INTEGER,
+    PRIMARY KEY(order_id)); 
+
+DELETE FROM Orders2;
+INSERT INTO Orders2 VALUES ('0001', '2012-01-05', '岡野　徹',    7);
+INSERT INTO Orders2 VALUES ('0002', '2012-01-05', '浜田　健一',  7);
+INSERT INTO Orders2 VALUES ('0003', '2012-01-06', '石井　慶子',  1);
+INSERT INTO Orders2 VALUES ('0004', '2012-01-07', '若山　みどり',5);
+INSERT INTO Orders2 VALUES ('0005', '2012-01-07', '庄野　弘一',  5);
+INSERT INTO Orders2 VALUES ('0006', '2012-01-11', '若山　みどり',2);
+INSERT INTO Orders2 VALUES ('0007', '2012-01-12', '岡野　徹',    1);
+COMMIT;
+
+--結合なしで商品数を求める
+SELECT DISTINCT order_date,
+                item_cnt
+  FROM Orders2;
+
+
+
+--2012-01-06 ～ 2012-01-07の期間に注文された商品の一覧を求める
+SELECT Orders.order_id,
+       OrderDetails.item_name
+  FROM Orders INNER JOIN OrderDetails
+    ON Orders.order_id = OrderDetails.order_id
+ WHERE Orders.order_date BETWEEN '2012-01-06' AND '2012-01-07';
+
+
+
+--受注明細（受注日の列を追加）
+DROP TABLE OrderDetails2;
+CREATE TABLE OrderDetails2
+ (order_id   CHAR(4),
+  seq        INTEGER,
+  item_name  VARCHAR(16),
+  order_date DATE,
+    PRIMARY KEY(order_id, seq)); 
+
+DELETE FROM OrderDetails2;
+INSERT INTO OrderDetails2 VALUES ('0001', 1, 'マカロン',         '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0001', 2, '紅茶',             '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0001', 3, 'オリーブオイル',   '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0001', 4, 'チョコ詰め合わせ', '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0002', 1, '紅茶',             '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0002', 2, '日本茶',           '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0002', 3, 'ティーポット',     '2012-01-05' );
+INSERT INTO OrderDetails2 VALUES ('0003', 1, '米',               '2012-01-06' );
+INSERT INTO OrderDetails2 VALUES ('0004', 1, 'アイロン',         '2012-01-07' );
+INSERT INTO OrderDetails2 VALUES ('0004', 2, 'ネクタイ',         '2012-01-07' );
+INSERT INTO OrderDetails2 VALUES ('0005', 1, 'チョコ詰め合わせ', '2012-01-07' );
+INSERT INTO OrderDetails2 VALUES ('0005', 2, '紅茶',             '2012-01-07' );
+INSERT INTO OrderDetails2 VALUES ('0005', 3, 'クッキーセット',   '2012-01-07' );
+INSERT INTO OrderDetails2 VALUES ('0006', 1, '牛肉',             '2012-01-11' );
+INSERT INTO OrderDetails2 VALUES ('0006', 2, '鍋セット',         '2012-01-11' );
+INSERT INTO OrderDetails2 VALUES ('0007', 1, '米',               '2012-01-12' );
+COMMIT;
+
+--結合なしで2012-01-06 ～ 2012-01-07の期間に注文された商品の一覧を求める
+SELECT order_id,
+       item_name
+  FROM OrderDetails2
+ WHERE order_date BETWEEN '2012-01-06' AND '2012-01-07';
+

@@ -1,0 +1,178 @@
+
+■9-2 伝統的な解法～隣接リストモデル～
+
+DROP TABLE OrgChartALM;
+CREATE TABLE OrgChartALM
+ (emp  VARCHAR(16) PRIMARY KEY,
+  boss VARCHAR(16)); 
+
+DELETE FROM OrgChartALM;
+INSERT INTO OrgChartALM VALUES ('アダム',  NULL);
+INSERT INTO OrgChartALM VALUES ('イブ',  'アダム');
+INSERT INTO OrgChartALM VALUES ('セト',  'アダム');
+INSERT INTO OrgChartALM VALUES ('カイン','セト');
+INSERT INTO OrgChartALM VALUES ('アベル','セト');
+INSERT INTO OrgChartALM VALUES ('ノア',  'セト');
+INSERT INTO OrgChartALM VALUES ('ヨブ',  'カイン');
+COMMIT;
+
+
+
+■9-3 新しい解法～入れ子集合モデル～
+
+CREATE TABLE OrgChart
+ (emp VARCHAR(16) PRIMARY KEY,
+  lft INTEGER NOT NULL,
+  rgt INTEGER NOT NULL,
+    CHECK (lft < rgt)); 
+
+DELETE FROM OrgChart;
+INSERT INTO OrgChart VALUES ('アダム',  1, 14);
+INSERT INTO OrgChart VALUES ('イブ',  2,  3);
+INSERT INTO OrgChart VALUES ('セト',  4, 13);
+INSERT INTO OrgChart VALUES ('カイン',  5,  8);
+INSERT INTO OrgChart VALUES ('ヨブ',  6,  7);
+INSERT INTO OrgChart VALUES ('アベル',  9,  10);
+INSERT INTO OrgChart VALUES ('ノア', 11,  12);
+COMMIT;
+
+--ルートを求める
+SELECT *
+  FROM OrgChart
+ WHERE lft = 1;
+
+
+--リーフを求める
+SELECT *
+  FROM OrgChart Boss
+ WHERE NOT EXISTS
+        (SELECT *
+           FROM OrgChart Sub
+          WHERE Sub.lft > Boss.lft
+            AND Sub.rgt < Boss.rgt);
+
+
+--ルートを求める（左端が1でなくてもOK）
+SELECT *
+  FROM OrgChart Sub
+ WHERE NOT EXISTS
+        (SELECT *
+           FROM OrgChart Boss
+          WHERE Sub.lft > Boss.lft
+            AND Sub.rgt < Boss.rgt);
+
+--ノードの深さを計算する
+SELECT Sub.emp , COUNT(Boss.emp) AS depth
+  FROM OrgChart Boss INNER JOIN OrgChart Sub
+    ON Sub.lft BETWEEN Boss.lft AND Boss.rgt
+ GROUP BY Sub.emp;
+
+
+--[第1段階]追加するノードの席を空ける
+UPDATE OrgChart
+   SET lft = CASE WHEN lft > 3
+                  THEN lft + 2
+                  ELSE lft END,
+       rgt = CASE WHEN rgt >= 3
+                  THEN rgt + 2
+                  ELSE rgt END
+ WHERE rgt >= 3;
+
+--[第2段階]イサク氏を追加する
+INSERT INTO OrgChart VALUES ('イサク', 3, 4);
+
+--カイン氏を解雇
+DELETE FROM OrgChart
+ WHERE lft  BETWEEN (SELECT lft FROM OrgChart WHERE emp = 'カイン')
+                AND (SELECT rgt FROM OrgChart WHERE emp = 'カイン');
+
+
+■9-4 もしも無限の資源があったなら～入れ子区間モデル～
+
+CREATE TABLE OrgChartNIM
+ (emp VARCHAR(16) PRIMARY KEY,
+  lft REAL NOT NULL,  -- 整数型から実数型へ変更
+  rgt REAL NOT NULL,
+    CHECK (lft < rgt)); 
+
+
+■9-5 ノードをフォルダだと思え～経路列挙モデル～
+
+--経路列挙モデル1
+DROP TABLE OrgChartPEM1;
+CREATE TABLE OrgChartPEM1
+ (emp  VARCHAR(16) PRIMARY KEY,
+  path VARCHAR(16) NOT NULL); 
+
+DELETE FROM OrgChartPEM1;
+INSERT INTO OrgChartPEM1 VALUES('アダム', '/アダム/');
+INSERT INTO OrgChartPEM1 VALUES('イブ',   '/アダム/イブ/');
+INSERT INTO OrgChartPEM1 VALUES('セト',   '/アダム/セト/');
+INSERT INTO OrgChartPEM1 VALUES('カイン', '/アダム/セト/カイン/');
+INSERT INTO OrgChartPEM1 VALUES('ヨブ',   '/アダム/セト/カイン/ヨブ/');
+INSERT INTO OrgChartPEM1 VALUES('アベル', '/アダム/セト/アベル/');
+INSERT INTO OrgChartPEM1 VALUES('ノア',   '/アダム/セト/ノア/');
+COMMIT;
+
+--経路列挙モデル2
+DROP TABLE OrgChartPEM2;
+CREATE TABLE OrgChartPEM2
+ (emp  VARCHAR(16) PRIMARY KEY,
+  path VARCHAR(16) NOT NULL); 
+
+DELETE FROM OrgChartPEM2;
+INSERT INTO OrgChartPEM2 VALUES('アダム', '.1.');
+INSERT INTO OrgChartPEM2 VALUES('イブ',   '.1.1.');
+INSERT INTO OrgChartPEM2 VALUES('セト',   '.1.2.');
+INSERT INTO OrgChartPEM2 VALUES('カイン', '.1.2.1.');
+INSERT INTO OrgChartPEM2 VALUES('ヨブ',   '.1.2.1.1.');
+INSERT INTO OrgChartPEM2 VALUES('アベル', '.1.2.2.');
+INSERT INTO OrgChartPEM2 VALUES('ノア',   '.1.2.3.');
+COMMIT;
+
+
+--ルートを求める[経路が主キーの場合]
+SELECT *
+  FROM OrgChartPEM1
+ WHERE emp = REPLACE(path, '/', '');
+
+--ルートを求める[経路が番号の場合]
+SELECT *
+  FROM OrgChartPEM2
+ WHERE path = '.1.';
+
+--リーフを求める
+SELECT *
+  FROM OrgChartPEM1 Boss
+ WHERE NOT EXISTS
+        (SELECT *
+           FROM OrgChartPEM1 Sub
+          WHERE Sub.path LIKE Boss.path || '_%');
+
+--ノードの深さを計算する
+SELECT emp, LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1 AS depth
+  FROM OrgChartPEM1;
+
+
+--親ノードを追加する
+INSERT INTO OrgChartPEM1 VALUES('イサク', (SELECT path FROM OrgChartPEM1 WHERE emp = 'セト') || 'イサク' || '/');
+
+UPDATE OrgChartPEM1
+   SET path = REPLACE(path, '/' || 'アベル' || '/', '/' || 'イサク' || '/' || 'アベル' || '/')
+ WHERE path LIKE '%/' || 'アベル' || '/%';
+
+UPDATE OrgChartPEM1
+   SET path = REPLACE(path, '/' || 'ノア' || '/', '/' || 'イサク' || '/' || 'ノア' || '/')
+ WHERE path LIKE '%/' || 'ノア' || '/%';
+
+
+--部分木を削除する
+DELETE FROM OrgChartPEM1
+ WHERE path LIKE '%/' || 'カイン' || '/%';
+
+
+--部分木を削除する(パフォーマンス改良版)
+DELETE FROM OrgChartPEM1
+ WHERE path LIKE (SELECT path 
+                    FROM OrgChartPEM1
+                   WHERE emp = 'カイン') || '%';

@@ -1,0 +1,265 @@
+
+■3-4 第1正規形
+
+--社員テーブル
+DROP TABLE Shain_NF1;
+CREATE TABLE Shain_NF1
+(shain_id  CHAR(4),
+ shain_mei VARCHAR(20),
+  PRIMARY KEY (shain_id));
+
+DELETE FROM Shain_NF1;
+INSERT INTO Shain_NF1 VALUES('000A', '加藤');
+INSERT INTO Shain_NF1 VALUES('000B', '藤本');
+INSERT INTO Shain_NF1 VALUES('001F', '三島');
+COMMIT;
+
+--扶養者テーブル
+DROP TABLE Fuyosha_NF1;
+CREATE TABLE Fuyosha_NF1
+(shain_id  CHAR(4),
+ ko_mei    VARCHAR(20),
+  PRIMARY KEY (shain_id, ko_mei));
+
+DELETE FROM Fuyosha_NF1;
+INSERT INTO Fuyosha_NF1 VALUES('000A', '達夫');
+INSERT INTO Fuyosha_NF1 VALUES('000A', '信二');
+INSERT INTO Fuyosha_NF1 VALUES('001F', '敦');
+INSERT INTO Fuyosha_NF1 VALUES('001F', '陽子');
+INSERT INTO Fuyosha_NF1 VALUES('001F', '清美');
+COMMIT;
+
+--内部結合
+SELECT Shain_NF1.shain_id,
+       Shain_NF1.shain_mei,
+       Fuyosha_NF1.ko_mei
+FROM Shain_NF1 INNER JOIN Fuyosha_NF1
+  ON Shain_NF1.shain_id = Fuyosha_NF1.shain_id;
+
+--外部結合
+SELECT Shain_NF1.shain_id,
+       Shain_NF1.shain_mei,
+       Fuyosha_NF1.ko_mei
+  FROM Shain_NF1 LEFT OUTER JOIN Fuyosha_NF1
+    ON Shain_NF1.shain_id = Fuyosha_NF1.shain_id;
+
+■3-5 第2正規形～部分関数従属
+
+--社員テーブル(第2正規形)
+DROP TABLE Shain_NF2;
+CREATE TABLE Shain_NF2
+(kaisha_cd CHAR(5),
+ shain_id  CHAR(4),
+ shain_mei VARCHAR(20),
+ nenrei    INTEGER,
+ busho_cd  CHAR(3),
+ busho_mei VARCHAR(20),
+  PRIMARY KEY (kaisha_cd, shain_id));
+
+--会社テーブル(第2正規形)
+DROP TABLE Kaisha_NF2;
+CREATE TABLE Kaisha_NF2
+(kaisha_cd  CHAR(5),
+ kaisha_mei VARCHAR(20),
+  PRIMARY KEY (kaisha_cd));
+
+DELETE FROM Shain_NF2;
+INSERT INTO Shain_NF2 VALUES('C0001', '000A', '加藤',40, 'D01', '開発');
+INSERT INTO Shain_NF2 VALUES('C0001', '000B', '藤本',32, 'D02', '人事');
+INSERT INTO Shain_NF2 VALUES('C0001', '001F', '三島',50, 'D03', '営業');
+INSERT INTO Shain_NF2 VALUES('C0002', '000A', '斉藤',47, 'D03', '営業');
+INSERT INTO Shain_NF2 VALUES('C0002', '009F', '田島',25, 'D01', '開発');
+INSERT INTO Shain_NF2 VALUES('C0002', '010A', '渋谷',33, 'D04', '総務');
+COMMIT;
+
+DELETE FROM Kaisha_NF2;
+INSERT INTO Kaisha_NF2 VALUES('C0001', 'A 商事');
+INSERT INTO Kaisha_NF2 VALUES('C0002', 'B 化学');
+COMMIT;
+
+SELECT Shain_NF2.kaisha_cd,
+       Kaisha_NF2.kaisha_mei,
+       Shain_NF2.shain_id,
+       Shain_NF2.shain_mei,
+       Shain_NF2.nenrei,
+       Shain_NF2.busho_cd,
+       Shain_NF2.busho_mei
+  FROM Shain_NF2 INNER JOIN Kaisha_NF2
+    ON Shain_NF2.kaisha_cd = Kaisha_NF2.kaisha_cd;
+
+
+■3-6 第3正規形～推移的関数従属
+
+--社員テーブル(第3正規形)
+DROP TABLE Shain_NF3;
+CREATE TABLE Shain_NF3
+(kaisha_cd CHAR(5),
+ shain_id  CHAR(4),
+ shain_mei VARCHAR(20),
+ nenrei    INTEGER,
+ busho_cd  CHAR(3),
+  PRIMARY KEY (kaisha_cd, shain_id));
+
+--会社テーブル(第3正規形)
+DROP TABLE Kaisha_NF3;
+CREATE TABLE Kaisha_NF3
+(kaisha_cd  CHAR(5),
+ kaisha_mei VARCHAR(20),
+  PRIMARY KEY (kaisha_cd));
+
+--部署テーブル(第3正規形)
+DROP TABLE Busho_NF3;
+CREATE TABLE Busho_NF3
+(busho_cd  CHAR(3),
+ busho_mei VARCHAR(20),
+  PRIMARY KEY (busho_cd));
+
+
+DELETE FROM Shain_NF3;
+INSERT INTO Shain_NF3 VALUES('C0001', '000A', '加藤',40, 'D01');
+INSERT INTO Shain_NF3 VALUES('C0001', '000B', '藤本',32, 'D02');
+INSERT INTO Shain_NF3 VALUES('C0001', '001F', '三島',50, 'D03');
+INSERT INTO Shain_NF3 VALUES('C0002', '000A', '斉藤',47, 'D03');
+INSERT INTO Shain_NF3 VALUES('C0002', '009F', '田島',25, 'D01');
+INSERT INTO Shain_NF3 VALUES('C0002', '010A', '渋谷',33, 'D04');
+COMMIT;
+
+DELETE FROM Kaisha_NF3;
+INSERT INTO Kaisha_NF3 VALUES('C0001', 'A 商事');
+INSERT INTO Kaisha_NF3 VALUES('C0002', 'B 化学');
+COMMIT;
+
+DELETE FROM Busho_NF3;
+INSERT INTO Busho_NF3 VALUES('D01', '開発');
+INSERT INTO Busho_NF3 VALUES('D02', '人事');
+INSERT INTO Busho_NF3 VALUES('D03', '営業');
+INSERT INTO Busho_NF3 VALUES('D04', '総務');
+COMMIT;
+
+
+SELECT Shain_NF3.kaisha_cd,
+       Shain_NF3.shain_id,
+       Shain_NF3.shain_mei,
+       Shain_NF3.nenrei,
+       Shain_NF3.busho_cd,
+       Busho_NF3.busho_mei
+FROM Shain_NF3 INNER JOIN Busho_NF3
+  ON Shain_NF3.busho_cd = Busho_NF3.busho_cd;
+
+
+■3-7 ボイス-コッド正規形
+DROP TABLE TblNonBCNF;
+CREATE TABLE TblNonBCNF
+(shain_id  CHAR(4),
+ team_cd   CHAR(3),
+ team_help CHAR(4),
+  PRIMARY KEY (shain_id, team_cd));
+
+DELETE FROM TblNonBCNF;
+INSERT INTO TblNonBCNF VALUES('000A',	'001',	'123W');
+INSERT INTO TblNonBCNF VALUES('000B',	'001',	'456Z');
+INSERT INTO TblNonBCNF VALUES('000B',	'002',	'003O');
+INSERT INTO TblNonBCNF VALUES('001F',	'001',	'123W');
+INSERT INTO TblNonBCNF VALUES('001F',	'002',	'003O');
+INSERT INTO TblNonBCNF VALUES('003O',	'002',	'999Y');
+COMMIT;
+
+
+DROP TABLE TblNonBCNF_ShainTeam;
+CREATE TABLE TblNonBCNF_ShainTeam
+(shain_id  CHAR(4),
+ team_cd   CHAR(3),
+  PRIMARY KEY (shain_id, team_cd));
+
+DELETE FROM TblNonBCNF_ShainTeam;
+INSERT INTO TblNonBCNF_ShainTeam VALUES('000A',	'001');
+INSERT INTO TblNonBCNF_ShainTeam VALUES('000B',	'001');
+INSERT INTO TblNonBCNF_ShainTeam VALUES('000B',	'002');
+INSERT INTO TblNonBCNF_ShainTeam VALUES('001F',	'001');
+INSERT INTO TblNonBCNF_ShainTeam VALUES('001F',	'002');
+INSERT INTO TblNonBCNF_ShainTeam VALUES('003O',	'002');
+COMMIT;
+
+
+DROP TABLE TblNonBCNF_HelpTeam;
+CREATE TABLE TblNonBCNF_HelpTeam
+(team_help CHAR(4),
+ team_cd   CHAR(3),
+  PRIMARY KEY (team_help, team_cd));
+
+DELETE FROM TblNonBCNF_HelpTeam;
+INSERT INTO TblNonBCNF_HelpTeam VALUES('123W',	'001');
+INSERT INTO TblNonBCNF_HelpTeam VALUES('456Z',	'001');
+INSERT INTO TblNonBCNF_HelpTeam VALUES('003O',	'002');
+INSERT INTO TblNonBCNF_HelpTeam VALUES('999Y',	'002');
+COMMIT;
+
+SELECT ST.shain_id,
+       ST.team_cd,
+       HT.team_help
+  FROM TblNonBCNF_ShainTeam ST INNER JOIN TblNonBCNF_HelpTeam HT
+    ON ST.team_cd = HT.team_cd;
+
+
+
+DROP TABLE TblBCNF_ShainHelp;
+CREATE TABLE TblBCNF_ShainHelp
+(shain_id  CHAR(4),
+ team_help CHAR(4),
+  PRIMARY KEY (shain_id, team_help));
+
+DELETE FROM TblBCNF_ShainHelp;
+INSERT INTO TblBCNF_ShainHelp VALUES('000A',	'123W');
+INSERT INTO TblBCNF_ShainHelp VALUES('000B',	'456Z');
+INSERT INTO TblBCNF_ShainHelp VALUES('000B',	'003O');
+INSERT INTO TblBCNF_ShainHelp VALUES('001F',	'123W');
+INSERT INTO TblBCNF_ShainHelp VALUES('001F',	'003O');
+INSERT INTO TblBCNF_ShainHelp VALUES('003O',	'999Y');
+COMMIT;
+
+DROP TABLE TblBCNF_TeamHelp;
+CREATE TABLE TblBCNF_TeamHelp
+(team_help CHAR(4),
+ team_cd  CHAR(3),
+  PRIMARY KEY (team_help));
+
+DELETE FROM TblBCNF_TeamHelp;
+INSERT INTO TblBCNF_TeamHelp VALUES('123W',	'001');
+INSERT INTO TblBCNF_TeamHelp VALUES('456Z',	'001');
+INSERT INTO TblBCNF_TeamHelp VALUES('003O',	'002');
+INSERT INTO TblBCNF_TeamHelp VALUES('999Y',	'003');
+COMMIT;
+
+SELECT SH.shain_id,
+       TH.team_cd,
+       TH.team_help
+  FROM TblBCNF_ShainHelp SH INNER JOIN TblBCNF_TeamHelp TH
+    ON SH.team_help = TH.team_help;
+
+
+■3-8 第4正規形
+
+DROP TABLE TblNon4NF_ShainTeamSeihin;
+CREATE TABLE TblNon4NF_ShainTeamSeihin
+(shain_id  CHAR(4),
+ team_cd   CHAR(3),
+ seihin_cd CHAR(2),
+  PRIMARY KEY (shain_id, team_cd, seihin_cd));
+
+DELETE FROM TblNon4NF_ShainTeamSeihin;
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('000A', '001', 'P1');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('000A', '001', 'P2');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('000B', '001', 'P1');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('000B', '002', 'P1');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('001F', '001', 'P2');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('001F', '002', 'P2');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('003O', '002', 'P2');
+INSERT INTO TblNon4NF_ShainTeamSeihin VALUES('003O', '002', 'P3');
+COMMIT;
+
+
+
+
+
+
+

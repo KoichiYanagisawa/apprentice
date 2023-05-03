@@ -1,0 +1,19 @@
+■演習6-2　インデックスの再編成
+
+--Oracle
+ALTER INDEX インデックス名 COALESCE;
+ALTER INDEX インデックス名 REBUILD;
+
+--SQL Server
+ALTER INDEX インデックス名 REORGANIZE;
+ALTER INDEX インデックス名 REBUILD;
+
+--DB2
+REORG INDEX インデックス名;
+
+--PostgreSQL
+REINDEX インデックス名;
+
+--MySQL
+OPTIMIZE TABLE テーブル名;
+

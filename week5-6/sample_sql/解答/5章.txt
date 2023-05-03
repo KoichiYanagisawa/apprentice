@@ -1,0 +1,126 @@
+
+■5-1 正規化されたテーブルに対するSQL
+
+※テーブルのDDLは第3章の演習問題で使用したものと同一
+
+--SQL①
+SELECT SB.shohin_bunrui_cd,
+       SB.shohin_bunrui_mei,
+       COUNT(*) AS item_cnt
+  FROM Shohinbunrui SB INNER JOIN Shohin S
+    ON SB.shohin_bunrui_cd = S.shohin_bunrui_cd
+ GROUP BY SB.shohin_bunrui_cd, SB.shohin_bunrui_mei;
+
+
+--SQL②
+SELECT SH.shisha_mei,
+       ST.shiten_mei,
+       S.shohin_mei
+  FROM Shisha SH INNER JOIN Shiten ST
+    ON SH.shisha_cd = ST.shisha_cd
+       INNER JOIN ShitenShohin SS
+          ON SS.shisha_cd = ST.shisha_cd
+         AND SS.shiten_cd = ST.shiten_cd
+             INNER JOIN Shohin S
+                ON SS.shohin_cd = S.shohin_cd;
+
+--SQL③
+SELECT ST.shisha_cd,
+       ST.shiten_cd,
+       COUNT(*) AS max_item_cnt
+  FROM Shiten ST INNER JOIN ShitenShohin SS
+    ON ST.shisha_cd = SS.shisha_cd
+   AND ST.shiten_cd = SS.shiten_cd
+ GROUP BY ST.shisha_cd, ST.shiten_cd
+HAVING COUNT(*) >=
+            ( SELECT MAX(item_cnt)
+                FROM ( SELECT ST.shisha_cd,
+                              ST.shiten_cd,
+                              COUNT(*) AS item_cnt
+                         FROM Shiten ST INNER JOIN ShitenShohin SS
+                           ON ST.shisha_cd = SS.shisha_cd
+                          AND ST.shiten_cd = SS.shiten_cd
+                        GROUP BY ST.shisha_cd, ST.shiten_cd) TMP );
+
+
+■演習5-2　非正規化によるSQLチューニング
+
+
+--商品分類に商品数の列を追加
+DROP TABLE Shohinbunrui2;
+CREATE TABLE Shohinbunrui2
+( shohin_bunrui_cd  CHAR(2) NOT NULL,
+  shohin_bunrui_mei VARCHAR(100) NOT NULL,
+  shohin_su         INTEGER NOT NULL,
+  PRIMARY KEY (shohin_bunrui_cd));
+
+
+DELETE FROM Shohinbunrui2;
+INSERT INTO Shohinbunrui2 VALUES ('C1', '水洗用品', 4);
+INSERT INTO Shohinbunrui2 VALUES ('C2', '食器',     2);
+INSERT INTO Shohinbunrui2 VALUES ('C3', '書籍',     1);
+INSERT INTO Shohinbunrui2 VALUES ('C4', '日用雑貨', 1);
+commit;
+
+
+--テーブル構成変更後のSQL文①
+SELECT *
+  FROM Shohinbunrui2;
+
+
+
+--「支店商品」テーブルに商品名の列を追加
+DROP TABLE ShitenShohin2;
+CREATE TABLE ShitenShohin2
+( shisha_cd   CHAR(3)       NOT NULL,
+  shiten_cd   CHAR(2)       NOT NULL,
+  shohin_cd   CHAR(3)       NOT NULL,
+  shisha_mei  VARCHAR(16)   NOT NULL,
+  shiten_mei  VARCHAR(16)   NOT NULL,
+  shohin_mei  VARCHAR(16)   NOT NULL,
+    PRIMARY KEY (shisha_cd, shiten_cd, shohin_cd));
+
+DELETE FROM ShitenShohin2;
+INSERT INTO ShitenShohin2 VALUES ('001', '01', '001', '東京', '渋谷','石鹸' );
+INSERT INTO ShitenShohin2 VALUES ('001', '01', '002', '東京', '渋谷','タオル' );
+INSERT INTO ShitenShohin2 VALUES ('001', '01', '003', '東京', '渋谷','ハブラシ' );
+INSERT INTO ShitenShohin2 VALUES ('001', '02', '002', '東京', '八重洲','タオル' );
+INSERT INTO ShitenShohin2 VALUES ('001', '02', '003', '東京', '八重洲','ハブラシ' );
+INSERT INTO ShitenShohin2 VALUES ('001', '02', '004', '東京', '八重洲','コップ' );
+INSERT INTO ShitenShohin2 VALUES ('001', '02', '005', '東京', '八重洲','箸' );
+INSERT INTO ShitenShohin2 VALUES ('001', '02', '006', '東京', '八重洲','スプーン' );
+INSERT INTO ShitenShohin2 VALUES ('002', '01', '001', '大阪', '堺','石鹸' );
+INSERT INTO ShitenShohin2 VALUES ('002', '01', '002', '大阪', '堺','タオル' );
+INSERT INTO ShitenShohin2 VALUES ('002', '02', '007', '大阪', '豊中','雑誌' );
+INSERT INTO ShitenShohin2 VALUES ('002', '02', '008', '大阪', '豊中','爪切り' );
+commit;
+
+
+SELECT shisha_mei, shiten_mei, shohin_mei
+  FROM ShitenShohin2;
+
+
+--「支店」テーブルに「商品数」列を追加
+DROP TABLE Shiten2;
+CREATE TABLE Shiten2
+( shisha_cd   CHAR(3)       NOT NULL,
+  shiten_cd   CHAR(2)       NOT NULL,
+  shiten_mei  VARCHAR(100) NOT NULL,
+  shohin_su         INTEGER NOT NULL,
+  PRIMARY KEY (shisha_cd, shiten_cd));
+
+DELETE FROM Shiten2;
+INSERT INTO Shiten2 VALUES ('001', '01', '渋谷',    3);
+INSERT INTO Shiten2 VALUES ('001', '02', '八重洲',  5);
+INSERT INTO Shiten2 VALUES ('002', '01', '堺',      2);
+INSERT INTO Shiten2 VALUES ('002', '02', '豊中',    2);
+COMMIT;
+
+SELECT shisha_cd,
+       shiten_cd,
+       shohin_su
+  FROM Shiten2
+ WHERE shohin_su = (SELECT MAX(shohin_su)
+                      FROM Shiten2);
+
+

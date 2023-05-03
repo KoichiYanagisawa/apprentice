@@ -1,0 +1,123 @@
+■演習問題3-3　正規化
+
+
+--支社支店商品
+DROP TABLE ShishaShitenShohin;
+CREATE TABLE ShishaShitenShohin
+( shisha_cd   CHAR(3)       NOT NULL,
+  shisha_mei  VARCHAR(100) NOT NULL,
+  shiten_cd   CHAR(2)       NOT NULL,
+  shiten_mei  VARCHAR(100) NOT NULL,
+  shohin_cd   CHAR(3)       NOT NULL,
+  shohin_mei  VARCHAR(100) NOT NULL,
+  shohin_bunrui_cd    CHAR(2) NOT NULL,
+  shohin_bunrui_mei   VARCHAR(100) NOT NULL,
+  PRIMARY KEY (shisha_cd, shiten_cd, shohin_cd));
+
+
+DELETE FROM ShishaShitenShohin;
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '01', '渋谷',  '001', '石鹸',     'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '01', '渋谷',  '002', 'タオル',   'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '01', '渋谷',  '003', 'ハブラシ', 'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '02', '八重洲','002', 'タオル',   'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '02', '八重洲','003', 'ハブラシ', 'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '02', '八重洲','004', 'コップ',   'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '02', '八重洲','005', '箸',       'C2', '食器');
+INSERT INTO ShishaShitenShohin VALUES ('001', '東京', '02', '八重洲','006', 'スプーン', 'C2', '食器');
+INSERT INTO ShishaShitenShohin VALUES ('002', '大阪', '01', '堺',    '001', '石鹸',     'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('002', '大阪', '01', '堺',    '002', 'タオル',   'C1', '水洗用品');
+INSERT INTO ShishaShitenShohin VALUES ('002', '大阪', '02', '豊中',  '007', '雑誌',     'C3', '書籍');
+INSERT INTO ShishaShitenShohin VALUES ('002', '大阪', '02', '豊中',  '008', '爪切り',   'C4', '日用雑貨');
+commit;
+
+
+--支社
+DROP TABLE Shisha;
+CREATE TABLE Shisha
+( shisha_cd   CHAR(3)       NOT NULL,
+  shisha_mei  VARCHAR(100) NOT NULL,
+  PRIMARY KEY (shisha_cd));
+
+DELETE FROM Shisha;
+INSERT INTO Shisha VALUES ('001', '東京');
+INSERT INTO Shisha VALUES ('002', '大阪');
+commit;
+
+
+--支店
+DROP TABLE Shiten;
+CREATE TABLE Shiten
+( shisha_cd   CHAR(3)       NOT NULL,
+  shiten_cd   CHAR(2)       NOT NULL,
+  shiten_mei  VARCHAR(100) NOT NULL,
+  PRIMARY KEY (shisha_cd, shiten_cd));
+
+
+DELETE FROM Shiten;
+INSERT INTO Shiten VALUES ('001', '01', '渋谷');
+INSERT INTO Shiten VALUES ('001', '02', '八重洲');
+INSERT INTO Shiten VALUES ('002', '01', '堺');
+INSERT INTO Shiten VALUES ('002', '02', '豊中');
+commit;
+
+
+--商品
+DROP TABLE Shohin;
+CREATE TABLE Shohin
+( shohin_cd         CHAR(3)       NOT NULL,
+  shohin_mei        VARCHAR(100) NOT NULL,
+  shohin_bunrui_cd  CHAR(2) NOT NULL,
+  PRIMARY KEY (shohin_cd));
+
+
+DELETE FROM Shohin;
+INSERT INTO Shohin VALUES ('001', '石鹸',     'C1');
+INSERT INTO Shohin VALUES ('002', 'タオル',   'C1');
+INSERT INTO Shohin VALUES ('003', 'ハブラシ', 'C1');
+INSERT INTO Shohin VALUES ('004', 'コップ',   'C1');
+INSERT INTO Shohin VALUES ('005', '箸',       'C2');
+INSERT INTO Shohin VALUES ('006', 'スプーン', 'C2');
+INSERT INTO Shohin VALUES ('007', '雑誌',     'C3');
+INSERT INTO Shohin VALUES ('008', '爪切り',   'C4');
+commit;
+
+
+--商品分類
+DROP TABLE Shohinbunrui;
+CREATE TABLE Shohinbunrui
+( shohin_bunrui_cd  CHAR(2) NOT NULL,
+  shohin_bunrui_mei   VARCHAR(100) NOT NULL,
+  PRIMARY KEY (shohin_bunrui_cd));
+
+
+DELETE FROM Shohinbunrui;
+INSERT INTO Shohinbunrui VALUES ('C1', '水洗用品');
+INSERT INTO Shohinbunrui VALUES ('C2', '食器');
+INSERT INTO Shohinbunrui VALUES ('C3', '書籍');
+INSERT INTO Shohinbunrui VALUES ('C4', '日用雑貨');
+commit;
+
+
+--支店商品
+DROP TABLE ShitenShohin;
+CREATE TABLE ShitenShohin
+( shisha_cd   CHAR(3)       NOT NULL,
+  shiten_cd   CHAR(2)       NOT NULL,
+  shohin_cd   CHAR(3)       NOT NULL,
+    PRIMARY KEY (shisha_cd, shiten_cd, shohin_cd));
+
+DELETE FROM ShitenShohin;
+INSERT INTO ShitenShohin VALUES ('001', '01', '001');
+INSERT INTO ShitenShohin VALUES ('001', '01', '002');
+INSERT INTO ShitenShohin VALUES ('001', '01', '003');
+INSERT INTO ShitenShohin VALUES ('001', '02', '002');
+INSERT INTO ShitenShohin VALUES ('001', '02', '003');
+INSERT INTO ShitenShohin VALUES ('001', '02', '004');
+INSERT INTO ShitenShohin VALUES ('001', '02', '005');
+INSERT INTO ShitenShohin VALUES ('001', '02', '006');
+INSERT INTO ShitenShohin VALUES ('002', '01', '001');
+INSERT INTO ShitenShohin VALUES ('002', '01', '002');
+INSERT INTO ShitenShohin VALUES ('002', '02', '007');
+INSERT INTO ShitenShohin VALUES ('002', '02', '008');
+commit;
+

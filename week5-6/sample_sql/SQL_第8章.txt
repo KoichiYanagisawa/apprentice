@@ -1,0 +1,179 @@
+
+■8-2 代理キー～主キーが役に立たないとき
+
+--市町村テーブル（タイムスタンプ）
+DROP TABLE CitiesTS;
+CREATE TABLE CitiesTS
+ (year       INTEGER,
+  city_cd    CHAR(4),
+  city_name  VARCHAR(16),
+  population INTEGER ,
+    PRIMARY KEY(year, city_cd)); 
+
+DELETE FROM CitiesTS;
+INSERT INTO CitiesTS VALUES (2005, 'A000', 'A 市',  100000);
+INSERT INTO CitiesTS VALUES (2005, 'A001', 'B 市',  120000);
+INSERT INTO CitiesTS VALUES (2005, 'A002', 'C 町',   30000);
+INSERT INTO CitiesTS VALUES (2005, 'A003', 'D 村',   10000);
+INSERT INTO CitiesTS VALUES (2006, 'A000', 'A 市',  100000);
+INSERT INTO CitiesTS VALUES (2006, 'A001', 'B 市',  120000);
+INSERT INTO CitiesTS VALUES (2006, 'A002', 'C 町',   30000);
+INSERT INTO CitiesTS VALUES (2006, 'A003', 'D 村',   10000);
+INSERT INTO CitiesTS VALUES (2007, 'A000', 'A 市',  100000);
+INSERT INTO CitiesTS VALUES (2007, 'A001', 'Q 市',  120000);
+INSERT INTO CitiesTS VALUES (2007, 'A002', 'C 町',   30000);
+INSERT INTO CitiesTS VALUES (2007, 'A003', 'D 村',   10000);
+COMMIT;
+
+
+--市町村テーブル（インターバル）
+DROP TABLE CitiesIT;
+CREATE TABLE CitiesIT
+ (start_year INTEGER,
+  end_year   INTEGER,
+  city_cd    CHAR(4),
+  city_name  VARCHAR(16),
+  population INTEGER ,
+    PRIMARY KEY(start_year, city_cd)); 
+
+DELETE FROM CitiesIT;
+INSERT INTO CitiesIT VALUES (1945, 9999, 'A000', 'A 市',  100000);
+INSERT INTO CitiesIT VALUES (1998, 2006, 'A001', 'B 市',  120000);
+INSERT INTO CitiesIT VALUES (1955, 9999, 'A002', 'C 町',   30000);
+INSERT INTO CitiesIT VALUES (2005, 9999, 'A003', 'D 村',   10000);
+INSERT INTO CitiesIT VALUES (2007, 9999, 'A001', 'Q 市',  120000);
+COMMIT;
+
+--タイムスタンプ方式
+SELECT city_cd,
+       city_name
+  FROM CitiesTS
+ WHERE year = 2007;
+
+--インターバル方式
+SELECT city_cd,
+       city_name
+  FROM CitiesIT
+ WHERE 2007 BETWEEN start_year AND end_year;
+
+--シーケンスオブジェクト（Oracle の場合）
+CREATE SEQUENCE test_seq
+START WITH 1
+INCREMENT BY 1
+NOCYCLE;
+
+SELECT test_seq.nextval
+  FROM DUAL;
+
+
+--シーケンスオブジェクト（PostgreSQL の場合）
+CREATE SEQUENCE test_seq
+START 1;
+
+SELECT nextval('test_seq');
+
+
+
+■8-3 列持ちテーブル～入れ子集合モデル～
+
+
+--扶養者（列持ち）
+DROP TABLE FuyoshaCOL;
+CREATE TABLE FuyoshaCOL
+ (emp_id    CHAR(4),
+  emp_name  VARCHAR(16),
+  kid_1     VARCHAR(16),
+  kid_2     VARCHAR(16),
+  kid_3     VARCHAR(16),
+    PRIMARY KEY(emp_id)); 
+
+DELETE FROM FuyoshaCOL;
+INSERT INTO FuyoshaCOL VALUES ('000A', '加藤', '達夫', '信二', NULL);
+INSERT INTO FuyoshaCOL VALUES ('000B', '藤本', NULL,   NULL,   NULL);
+INSERT INTO FuyoshaCOL VALUES ('001F', '三島', '敦',   '陽子', '清美');
+COMMIT;
+
+
+--扶養者（行持ち）
+DROP TABLE FuyoshaROW;
+CREATE TABLE FuyoshaROW
+ (emp_id    CHAR(4),
+  seq       INTEGER,
+  kid       VARCHAR(16),
+    PRIMARY KEY(emp_id, seq)); 
+
+DELETE FROM FuyoshaROW;
+INSERT INTO FuyoshaROW VALUES ('000A', 1, '達夫');
+INSERT INTO FuyoshaROW VALUES ('000A', 2, '信二');
+INSERT INTO FuyoshaROW VALUES ('000A', 3, NULL);
+INSERT INTO FuyoshaROW VALUES ('000B', 1, NULL);
+INSERT INTO FuyoshaROW VALUES ('000B', 2, NULL);
+INSERT INTO FuyoshaROW VALUES ('000B', 3, NULL);
+INSERT INTO FuyoshaROW VALUES ('001F', 1, '敦');
+INSERT INTO FuyoshaROW VALUES ('001F', 2, '陽子');
+INSERT INTO FuyoshaROW VALUES ('001F', 3, '清美');
+COMMIT;
+
+
+--列持ち⇒行持ちへの変換
+SELECT emp_id,
+       1,
+       kid_1
+  FROM FuyoshaCOL
+ WHERE kid_1 IS NOT NULL
+UNION ALL
+SELECT emp_id,
+       2,
+       kid_2
+  FROM FuyoshaCOL
+ WHERE kid_2 IS NOT NULL
+UNION ALL
+SELECT emp_id,
+       3,
+       kid_3
+ FROM FuyoshaCOL
+ WHERE kid_3 IS NOT NULL;
+
+
+SELECT emp_id,
+       MAX(CASE WHEN seq = 1 THEN kid ELSE NULL END),
+       MAX(CASE WHEN seq = 2 THEN kid ELSE NULL END),
+       MAX(CASE WHEN seq = 3 THEN kid ELSE NULL END)
+FROM FuyoshaROW
+GROUP BY emp_id;
+
+
+■8-4 アドホックな集計キー
+
+--都道府県
+DROP TABLE Prefecture
+CREATE TABLE Prefecture
+(pre_cd     CHAR(2),
+ pre_name   VARCHAR(16),
+ population INTEGER,
+   PRIMARY KEY(pre_cd));
+
+
+DELETE FROM Prefecture;
+INSERT INTO Prefecture VALUES ('01', '北海道', 550);
+INSERT INTO Prefecture VALUES ('02', '青森',   130);
+INSERT INTO Prefecture VALUES ('03', '岩手',   133);
+INSERT INTO Prefecture VALUES ('22', '静岡',   370);
+INSERT INTO Prefecture VALUES ('23', '愛知',   740);
+INSERT INTO Prefecture VALUES ('24', '三重',   185);
+INSERT INTO Prefecture VALUES ('36', '徳島',    78);
+INSERT INTO Prefecture VALUES ('37', '香川',    99);
+COMMIT;
+
+
+--GROUP BY 句の中でアドホックキーを作る
+SELECT CASE WHEN pre_cd IN ('01', '02', '03') THEN '01'
+            WHEN pre_cd IN ('22', '23', '24') THEN '02'
+            WHEN pre_cd IN ('36', '37') THEN '03'
+       ELSE NULL END AS district_cd,
+       SUM(population)
+  FROM Prefecture
+ GROUP BY CASE WHEN pre_cd IN ('01', '02', '03') THEN '01'
+               WHEN pre_cd IN ('22', '23', '24') THEN '02'
+               WHEN pre_cd IN ('36', '37') THEN '03'
+          ELSE NULL END;

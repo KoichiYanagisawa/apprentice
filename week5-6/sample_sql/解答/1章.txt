@@ -1,0 +1,18 @@
+■演習1-1　DBMSの情報確認
+
+--Oracle
+select * from v$version;
+
+--SQL Server
+SELECT SERVERPROPERTY('productversion'), SERVERPROPERTY ('productlevel'), SERVERPROPERTY ('edition');
+
+--DB2（OS コマンド）
+db2level
+
+--PostgreSQL
+select version();
+
+--MySQL
+select version();
+
+
