@@ -1,0 +1,41 @@
+ユーザー名
+購入履歴
+購入時間
+商品名
+カテゴリー
+値段
+購入日
+
+@startuml ec_site
+
+' ユーザー情報を管理するエンティティ
+entity "User"{
+  *user_id:int
+  --
+  name:varchar(255)
+  address:varchar(255)
+  mail:varchar(255)
+
+}
+
+' 商品情報を管理するエンティティ
+entity "Product"{
+  *purchase_id:int
+  --
+  user_id:int
+}
+
+' 商品カテゴリーの情報を管理するエンティティ
+entity "Category"{
+}
+
+' 注文情報を管理するエンティティ
+entity "Order"{
+}
+
+' 注文の詳細情報を管理するエンティティ
+entity "OrderDetail"{}
+
+User "1" --o "0..*" Purchase_History
+
+@enduml
