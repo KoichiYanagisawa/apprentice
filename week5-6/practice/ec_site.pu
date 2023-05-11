@@ -19,6 +19,8 @@ entity "products" as product{
   category_id:int(10){fk}
   ' DECIMAL型での表示サイズは億の単位か、最大まで広げるかわからない
   product_price:decimal(8,0)
+  product_description:varchar(255)
+  minimum_order_unit:int(10)
 }
 
 ' 商品在庫情報を管理するエンティティ
@@ -48,14 +50,14 @@ entity "orders" as order{
 ' 注文の詳細情報を管理するエンティティ
 entity "order_details" as order_detail{
   *order_num:bigint(20)
+  *product_id:bigint(20){fk}
   --
-  product_id:bigint(20){fk}
   quantity:int(10)
 }
 
 user "1" --o "0..*" order
 product "1..*" o-- "1" category
 order "1" --o "1..*" order_detail
-order_detail "1" o-- "1..*" product
+order_detail "1" --o "1..*" product
 inventories "0..*" o-- "1" product
 @enduml
