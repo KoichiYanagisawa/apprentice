@@ -1,41 +1,61 @@
-ユーザー名
-購入履歴
-購入時間
-商品名
-カテゴリー
-値段
-購入日
-
 @startuml ec_site
+!define fk FOREIGN_KEY
 
 ' ユーザー情報を管理するエンティティ
-entity "User"{
-  *user_id:int
+entity "users" as user{
+  *user_id:int(10)
   --
-  name:varchar(255)
-  address:varchar(255)
-  mail:varchar(255)
-
+  user_name:varchar(255)
+  user_address:varchar(255)
+  user_mail:varchar(255)
 }
 
 ' 商品情報を管理するエンティティ
-entity "Product"{
-  *purchase_id:int
+entity "products" as product{
+  *product_id:bigint(20)
   --
-  user_id:int
+  product_name:varchar(255)
+  product_jancd:bigint(13)
+  category_id:int(10){fk}
+  ' DECIMAL型での表示サイズは億の単位か、最大まで広げるかわからない
+  product_price:decimal(8,0)
+}
+
+' 商品在庫情報を管理するエンティティ
+entity "inventories" as inventories{
+  *product_id:bigint(20)
+  *lot_num:bigint(20)
+  --
+  quantity:int(10)
+  best_by_date:date
 }
 
 ' 商品カテゴリーの情報を管理するエンティティ
-entity "Category"{
+entity "categories" as category{
+  *category_id:int(10)
+  --
+  category_name:varchar(255)
 }
 
 ' 注文情報を管理するエンティティ
-entity "Order"{
+entity "orders" as order{
+  *order_num:bigint(20)
+  --
+  user_id:int(10){fk}
+  order_datetime:datetime
 }
 
 ' 注文の詳細情報を管理するエンティティ
-entity "OrderDetail"{}
+entity "order_details" as order_detail{
+  *order_num:bigint(20)
+  --
+  product_id:bigint(20){fk}
+  quantity:int(10)
+}
 
-User "1" --o "0..*" Purchase_History
-
+user "1" --o "0..*" order
+product "1..*" o-- "1" category
+order "1" --o "1..*" order_detail
+order_detail "1" o-- "1..*" product
+inventories "0..*" o-- "1" product
 @enduml
