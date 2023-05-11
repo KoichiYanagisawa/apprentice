@@ -1,0 +1,4 @@
+@startuml internet_tv
+entity "genre"
+entity "program_list"
+@enduml
