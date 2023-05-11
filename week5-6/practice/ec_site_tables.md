@@ -12,7 +12,7 @@
 |product_id|bigint(20)||PRIMARY KEY|1|AUTO INCREMENT|||
 |product_name|varchar(255)|||||||
 |product_jancd|bigint(13)||INDEX|||||
-|product_id|int(10)||INDEX|||YES||
+|category_id|int(10)||INDEX|||YES||
 |product_price|decimal(8,0)|||0||||
 |product_description|varchar(255)|YES||||||
 |minimum_order_unit|int(10)|YES||1||||
@@ -36,5 +36,5 @@
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|外部キー|ユニークキー|
 |----|----|----|----|----|----|----|----|
 |order_num|bigint(20)||PRIMARY KEY|||YES||
-|product_id|bigint(20)||PRIMARY EKY|||YES||
+|product_id|bigint(20)||PRIMARY KEY|||YES||
 |quantity|int(10)|||1||||
