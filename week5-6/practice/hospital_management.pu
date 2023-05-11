@@ -1,0 +1,36 @@
+@startuml hospital_management
+!define fk FOREIGN_KEY
+entity "患者"{
+  *患者_id
+  --
+  患者_name
+}
+' entity "担当医師"{
+'   *患者
+'   *診療科
+'   --
+'   担当医師
+' }
+entity "予約"{
+  *予約_id
+  --
+  患者_id{fk}
+  診療科_id{fk}
+  医師_id{fk}
+}
+entity "医師"{
+  *医師_id
+  --
+  医師_name
+  診療科_id{fk}
+}
+entity "診療科"{
+  *診療科_id
+  --
+  診療科_name
+}
+医師 "0..*" o-- "1..*" 診療科
+患者 "0..*" --o "1..*" 診療科
+予約 "1" o-- "1..*" 患者
+予約 "1" -- "1" 医師
+@enduml
