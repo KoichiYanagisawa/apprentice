@@ -66,7 +66,7 @@
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
 |-------|--------|----|---|-----|--------------|
-|program_genres_id|bigint(20)||PRIMARY|1||
+|program_genres_id|bigint(20)||PRIMARY|1|YES|
 |genre_id|int(4)|||||
 |program_id|int(10)|||||
 - 外部キー制約：genre_idに対して、genres.genre_idから設定
