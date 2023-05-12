@@ -45,15 +45,25 @@ INNER JOIN
 INNER JOIN
     seasons ON seasons.season_id = episodes.season_id
 WHERE
-    start_datetime LIKE '2023-05-09%';
+    DATE(start_datetime) = CURRENT_DATE
+ORDER BY
+    start_datetime;
 
 -- 4. ドラマというチャンネルがあったとして、ドラマのチャンネルの番組表を表示するために、本日から一週間分、何日の何時から何の番組が放送されるのかを知りたいです。ドラマのチャンネルに対して、放送開始時刻、放送終了時刻、シーズン数、エピソード数、エピソードタイトル、エピソード詳細を本日から一週間分取得してください
-SELECT channel_name, start_datetime, end_datetime, season_num, episode_num, episode_title, episode_info
-FROM program_list
-INNER JOIN program_genres ON program_genres.program_id = program_list.program_id
-INNER JOIN genres ON genres.genre_id = program_genres.genre_id
-INNER JOIN channels ON channels.channel_id = program_list.channel_id
-INNER JOIN episodes ON episodes.episode_id = program_list.episode_id
-INNER JOIN seasons ON seasons.season_id = episodes.season_id
-WHERE DATE(start_datetime) BETWEEN '2023-05-03' AND '2023-05-09'
-AND genre_name = 'ドラマ';
+SELECT
+    channel_name, start_datetime, end_datetime, season_num, episode_num, episode_title, episode_info
+FROM
+    program_list
+INNER JOIN
+    program_genres ON program_genres.program_id = program_list.program_id
+INNER JOIN
+    genres ON genres.genre_id = program_genres.genre_id
+INNER JOIN
+    channels ON channels.channel_id = program_list.channel_id
+INNER JOIN
+    episodes ON episodes.episode_id = program_list.episode_id
+INNER JOIN
+    seasons ON seasons.season_id = episodes.season_id
+WHERE
+    DATE(start_datetime) BETWEEN CURRENT_DATE() AND CURRENT_DATE() + INTERVAL 7 DAY
+    AND genre_name = 'ドラマ';
