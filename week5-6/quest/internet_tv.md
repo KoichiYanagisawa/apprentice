@@ -69,6 +69,6 @@
 |-------|--------|----|---|-----|--------------|
 |program_genres_id|bigint(20)||PRIMARY|1|YES|
 |genre_id|int(4)|||||
-|program_id|int(10)|||||
+|program_id|bigint(20)|||||
 - 外部キー制約：genre_idに対して、genres.genre_idから設定
 - 外部キー制約：program_idに対して、program_list.program_idから設定

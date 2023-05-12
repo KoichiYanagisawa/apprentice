@@ -56,14 +56,14 @@ entity "program_genres"{
   *program_genres_id:bigint(20)
   --
   genre_id:int(4){fk}
-  program_id:int(10){fk}
+  program_id:bigint(10){fk}
 }
 
 ' リレーションシップを明示する
-channels "1" --o "1..*" program_list
-episodes "1" --o "1..*" program_list
-series "0..1" --o "1..*" seasons
-seasons "0..1" --o "1..*" episodes
-program_genres "1" --o "1..*" genres
-program_genres "1" --o "1..*" program_list
+channels ||--o{ program_list
+episodes ||--o{ program_list
+series   ||--o{ seasons
+seasons  ||--o{ episodes
+program_genres ||--|{ genres
+program_genres ||--|{ program_list
 @enduml
