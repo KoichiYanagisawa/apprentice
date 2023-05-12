@@ -14,7 +14,8 @@
 |channel_id|int(10)|||||
 |episode_id|bigint(20)|||||
 |program_list_title|varchar(100)|||||
-|playback_datetime|datetime|||||
+|start_datetime|datetime|||||
+|end_datetime|datetime|||||
 |program_list_info|varchar(255)|||||
 |program_list_views|int(10)|||||
 - 外部キー制約：channel_idに対して、channels.channelから設定

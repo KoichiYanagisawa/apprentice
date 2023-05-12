@@ -53,7 +53,8 @@ CREATE TABLE program_list (
   channel_id INT(10) NOT NULL,
   episode_id BIGINT(20) NOT NULL,
   program_list_title VARCHAR(100) NOT NULL,
-  playback_datetime DATETIME NOT NULL,
+  start_datetime DATETIME NOT NULL,
+  end_datetime DATETIME NOT NULL,
   program_list_info VARCHAR(255),
   program_list_views INT(10) NOT NULL,
   PRIMARY KEY (program_id),
@@ -84,44 +85,54 @@ CREATE TABLE program_genres (
 
 -- channelsテーブルにデータを挿入
 INSERT INTO channels (channel_name)
-VALUES ('Channel 1'), ('Channel 2'), ('Channel 3');
+VALUES ('チャンネル1'), ('チャンネル2'), ('チャンネル3');
 
 -- seriesテーブルにデータを挿入
 INSERT INTO series (series_title)
-VALUES ('Series A'), ('Series B'), ('Series C'), ('Series D'), ('Series E'), ('Series F'), ('Series G'), ('Series H');
+VALUES ('シリーズA'), ('シリーズB'), ('シリーズC'), ('シリーズD'), ('シリーズE'), ('シリーズF'), ('シリーズG'), ('シリーズH');
 
 -- genresテーブルにデータを挿入
 INSERT INTO genres (genre_name)
-VALUES ('Drama'), ('Comedy'), ('Action');
+VALUES ('アニメ'), ('ドラマ'), ('スポーツ');
 
 -- seasonsテーブルにデータを挿入
 INSERT INTO seasons (series_id, season_num, season_title)
-VALUES (1, 1, 'Series A - Season 1'),
-       (1, 2, 'Series A - Season 2'),
-       (2, 1, 'Series B - Season 1'),
-       (2, 2, 'Series B - Season 2'),
-       (3, 1, 'Series C - Season 1'),
-       (4, 1, 'Series D - Season 1'),
-       (5, 1, 'Series E - Season 1'),
-       (6, 1, 'Series F - Season 1');
+VALUES (1, 1, 'シリーズA - シーズン1'),
+       (1, 2, 'シリーズA - シーズン2'),
+       (2, 1, 'シリーズB - シーズン1'),
+       (2, 2, 'シリーズB - シーズン2'),
+       (3, 1, 'シリーズC - シーズン1'),
+       (4, 1, 'シリーズD - シーズン1'),
+       (5, 1, 'シリーズE - シーズン1'),
+       (6, 1, 'シリーズF - シーズン1');
 
 -- episodesテーブルにデータを挿入
 INSERT INTO episodes (season_id, episode_title, episode_num, playback_time, release_date, episode_info, episode_views, file_path)
-VALUES (1, 'Episode 1', 1, '00:42:00', '2023-01-01', 'Series A - Season 1 - Episode 1', 100, 'file1.mp4'),
-       (1, 'Episode 2', 2, '00:45:00', '2023-01-08', 'Series A - Season 1 - Episode 2', 80, 'file2.mp4'),
-       (2, 'Episode 1', 1, '00:50:00', '2023-02-01', 'Series B - Season 1 - Episode 1', 120, 'file3.mp4'),
-       (2, 'Episode 2', 2, '00:48:00', '2023-02-08', 'Series B - Season 1 - Episode 2', 95, 'file4.mp4'),
-       (3, 'Episode 1', 1, '00:55:00', '2023-03-01', 'Series C - Season 1 - Episode 1', 130, 'file5.mp4'),
-       (4, 'Episode 1', 1, '00:53:00', '2023-04-01', 'Series D - Season 1 - Episode 1', 75, 'file6.mp4');
+VALUES (1, 'エピソード1', 1, '00:30:00', '2023-05-01', 'シリーズA - シーズン1 - エピソード1', 100, 'file1.mp4'),
+       (1, 'エピソード2', 2, '00:30:00', '2023-05-02', 'シリーズA - シーズン1 - エピソード2', 80, 'file2.mp4'),
+       (2, 'エピソード1', 1, '01:00:00', '2023-05-03', 'シリーズB - シーズン1 - エピソード1', 120, 'file3.mp4'),
+       (2, 'エピソード2', 2, '01:00:00', '2023-05-04', 'シリーズB - シーズン1 - エピソード2', 95, 'file4.mp4'),
+       (3, 'エピソード1', 1, '02:00:00', '2023-05-05', 'シリーズC - シーズン1 - エピソード1', 130, 'file5.mp4'),
+       (4, 'エピソード1', 1, '02:00:00', '2023-05-06', 'シリーズD - シーズン1 - エピソード1', 110, 'file6.mp4'),
+       (5, 'エピソード1', 1, '00:30:00', '2023-05-07', 'シリーズE - シーズン1 - エピソード1', 90, 'file7.mp4'),
+       (5, 'エピソード2', 2, '00:30:00', '2023-05-08', 'シリーズE - シーズン1 - エピソード2', 85, 'file8.mp4'),
+       (6, 'エピソード1', 1, '01:00:00', '2023-05-09', 'シリーズF - シーズン1 - エピソード1', 140, 'file9.mp4'),
+       (6, 'エピソード2', 2, '01:00:00', '2023-05-10', 'シリーズF - シーズン1 - エピソード2', 120, 'file10.mp4');
 
 -- program_listテーブルにデータを挿入
-INSERT INTO program_list (channel_id, episode_id, program_list_title, playback_datetime, program_list_info, program_list_views)
-VALUES (1, 1, 'Channel 1 - Episode 1', '2023-05-01 20:00:00', 'Series A - Season 1 - Episode 1 on Channel 1', 50),
-       (1, 2, 'Channel 1 - Episode 2', '2023-05-08 20:00:00', 'Series A - Season 1 - Episode 2 on Channel 1', 40),
-       (2, 3, 'Channel 2 - Episode 1', '2023-05-02 21:00:00', 'Series B - Season 1 - Episode 1 on Channel 2', 60),
-       (2, 4, 'Channel 2 - Episode 2', '2023-05-09 21:00:00', 'Series B - Season 1 - Episode 2 on Channel 2', 55),
-       (3, 5, 'Channel 3 - Episode 1', '2023-05-03 22:00:00', 'Series C - Season 1 - Episode 1 on Channel 3', 70);
+INSERT INTO program_list (channel_id, episode_id, program_list_title, start_datetime, end_datetime, program_list_info, program_list_views)
+VALUES (1, 1, 'チャンネル1 - エピソード1', '2023-05-01 19:00:00', '2023-05-01 19:30:00', 'シリーズA - シーズン1 - エピソード1 on チャンネル1', 50),
+       (1, 2, 'チャンネル1 - エピソード2', '2023-05-02 19:00:00', '2023-05-02 19:30:00', 'シリーズA - シーズン1 - エピソード2 on チャンネル1', 40),
+       (2, 3, 'チャンネル2 - エピソード1', '2023-05-03 19:00:00', '2023-05-03 20:00:00', 'シリーズB - シーズン1 - エピソード1 on チャンネル2', 60),
+       (2, 4, 'チャンネル2 - エピソード2', '2023-05-04 19:00:00', '2023-05-04 20:00:00', 'シリーズB - シーズン1 - エピソード2 on チャンネル2', 55),
+       (3, 5, 'チャンネル3 - エピソード1', '2023-05-05 19:00:00', '2023-05-05 21:00:00', 'シリーズC - シーズン1 - エピソード1 on チャンネル3', 70),
+       (3, 6, 'チャンネル3 - エピソード2', '2023-05-06 19:00:00', '2023-05-06 21:00:00', 'シリーズD - シーズン1 - エピソード1 on チャンネル3', 65),
+       (1, 7, 'チャンネル1 - エピソード3', '2023-05-07 19:00:00', '2023-05-07 19:30:00', 'シリーズE - シーズン1 - エピソード1 on チャンネル1', 45),
+       (1, 8, 'チャンネル1 - エピソード4', '2023-05-08 19:00:00', '2023-05-08 19:30:00', 'シリーズE - シーズン1 - エピソード2 on チャンネル1', 42),
+       (2, 9, 'チャンネル2 - エピソード3', '2023-05-09 19:00:00', '2023-05-09 20:00:00', 'シリーズF - シーズン1 - エピソード1 on チャンネル2', 58),
+       (2, 10, 'チャンネル2 - エピソード4', '2023-05-10 19:00:00', '2023-05-10 20:00:00', 'シリーズF - シーズン1 - エピソード2 on チャンネル2', 52);
 
 -- program_genresテーブルにデータを挿入
 INSERT INTO program_genres (genre_id, program_id)
-VALUES (1, 1), (1, 2), (2, 3), (2, 4), (3, 5);
+VALUES (1, 1), (1, 2), (2, 3), (2, 4), (3, 5),
+       (3, 6), (1, 7), (1, 8), (2, 9), (2, 10);
