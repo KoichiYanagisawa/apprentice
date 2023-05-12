@@ -2,39 +2,39 @@
 !define fk FOREIGN_KEY
 ' 複数のチャンネル
 entity "channels"{
-  *channel_id:int(4)
+  *channel_id:int(10)
   --
   channel_name:varchar(100)
 }
 ' 番組表
 entity "program_list"{
-  *program_id:int(10)
-  channel_id:int(4){fk}
+  *program_id:bigint(20)
+  channel_id:int(10){fk}
   --
   program_list_title:varchar(100)
-  episode_id:int(4){fk}
+  episode_id:bigint(20){fk}
   playback_datetime:datetime
   program_list_info:varchar(255)
   program_list_views:int(10)
 }
 ' 複数のシリーズ
 entity "series"{
-  *series_id:int(4)
+  *series_id:bigint(20)
   --
   series_title:varchar(100)
 }
 ' 複数のシーズン
 entity "seasons"{
-  *seasons_id:int(4)
-  series_id:int(4){fk}
+  *season_id::bigint(20)
+  series_id:bigint(20){fk}
   --
   season_num:int(2)
   season_title:varchar(100)
 }
 ' 複数のエピソード
 entity "episodes"{
-  *episode_id:int(4)
-  seasons_id:int(4){fk}
+  *episode_id:bigint(20)
+  season_id::bigint(20){fk}
   --
   episode_title:varchar(100)
   episode_num:int(4)
@@ -50,9 +50,9 @@ entity "genres"{
   --
   genre_name:varchar(50)
 }
-' 一つのエピソードは複数のジャンルに属するのを表現する
+' 一つの番組は複数のジャンルに属するのを表現する
 entity "program_genres"{
-  *program_genres_id:int(10)
+  *program_genres_id:bigint(20)
   --
   genre_id:int(4){fk}
   program_id:int(10){fk}
