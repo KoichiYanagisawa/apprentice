@@ -19,7 +19,7 @@
 |program_list_views|int(10)|||||
 - 外部キー制約：channel_idに対して、channels.channelから設定
 - 外部キー制約：episode_idに対して、episodes.episode_idから設定
-- ユニークキー制約：program_list カラムに対して設定
+- ユニークキー制約：program_list_title カラムに対して設定
 
 テーブル：series
 
@@ -38,7 +38,6 @@
 |season_num|int(2)|||||
 |season_title|varchar(100)|||||
 - 外部キー制約：series_idに対して、series.series_idから設定
-- ユニークキー制約：season_title カラムに対して設定
 
 テーブル：episodes
 
@@ -54,7 +53,6 @@
 |episode_views|int(10)|||||
 |file_path|varchar(255)|||||
 - 外部キー制約：seasons_idに対して、seasons.seasons_idから設定
-- ユニークキー制約：episode_title カラムに対して設定
 
 テーブル：genres
 
