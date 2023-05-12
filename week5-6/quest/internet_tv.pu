@@ -26,7 +26,7 @@ entity "series"{
 }
 ' 複数のシーズン
 entity "seasons"{
-  *season_id::bigint(20)
+  *season_id:bigint(20)
   series_id:bigint(20){fk}
   --
   season_num:int(2)
