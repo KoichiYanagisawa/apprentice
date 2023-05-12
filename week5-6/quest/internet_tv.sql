@@ -44,7 +44,7 @@ CREATE TABLE episodes (
   episode_views INT(10) NOT NULL,
   file_path VARCHAR(255) NOT NULL,
   PRIMARY KEY (episode_id),
-  FOREIGN KEY (season_id) REFERENCES seasons(seasons_id)
+  FOREIGN KEY (season_id) REFERENCES seasons(season_id)
 );
 
 -- program_list テーブルの作成
