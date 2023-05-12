@@ -7,7 +7,7 @@
 5. `show databases;`を実行し、`internet_tv`というデータベースがあることを確認します。
 6. `use internet_tv`を実行します。
 7. `show tables;`を実行します。
-8. 以下のように表示されると利用準備完了です。お疲れ様でした。
+8. 以下のように表示されると利用準備完了です。
 ```
 +-----------------------+
 | Tables_in_internet_tv |
@@ -21,3 +21,12 @@
 | series                |
 +-----------------------+
 ```
+### インターネットTVのQUEST回答はそれぞれ以下となります。
+- ER図
+  - `internet_tv.pu`
+- ステップ1の回答
+  - `internet_tv.md`
+- ステップ2の回答
+  - `internet_tv.sql`
+- ステップ3の回答
+  - `quest_step3.sql`
