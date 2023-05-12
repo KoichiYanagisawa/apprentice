@@ -74,7 +74,7 @@ CREATE TABLE genres (
 CREATE TABLE program_genres (
   program_genres_id BIGINT(20) NOT NULL AUTO_INCREMENT,
   genre_id INT(4) NOT NULL,
-  program_id INT(10) NOT NULL,
+  program_id BIGINT(20) NOT NULL,
   PRIMARY KEY (program_genres_id),
   FOREIGN KEY (genre_id) REFERENCES genres(genre_id),
   FOREIGN KEY (program_id) REFERENCES program_list(program_id)
