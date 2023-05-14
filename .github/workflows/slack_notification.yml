@@ -16,10 +16,23 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
+          COMMIT_ID=$(git rev-parse --short HEAD)
+          COMMIT_URL="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA} | grep "daily-report/2023/")
           FILE_LINKS=""
           for file in $CHANGED_FILES; do
-            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
+            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\n"
           done
-          PAYLOAD=$(printf '{"text": "更新がありました:\\n%s"}' "${FILE_LINKS}")
+          PAYLOAD=$(echo -e "{
+            \"attachments\": [
+              {
+                \"fallback\": \"更新がありました: daily-report/2023\",
+                \"color\": \"#36a64f\",
+                \"pretext\": \"daily-report/2023 に更新がありました\",
+                \"title\": \"Commit ${COMMIT_ID}\",
+                \"title_link\": \"${COMMIT_URL}\",
+                \"text\": \"更新されたファイル:\n${FILE_LINKS}\"
+              }
+            ]
+          }")
           curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
