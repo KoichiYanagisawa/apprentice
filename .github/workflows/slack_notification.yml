@@ -11,12 +11,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Notify Slack
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
-          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA})
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA} HEAD~1)
           echo "CHANGED_FILES: ${CHANGED_FILES}"
           FILE_LINKS=""
           for file in $CHANGED_FILES; do
