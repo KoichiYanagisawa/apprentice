@@ -9,8 +9,17 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Notify Slack
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"更新がありました: daily-report/2023"}' $SLACK_WEBHOOK
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA} | grep "daily-report/2023/")
+          FILE_LINKS=""
+          for file in $CHANGED_FILES; do
+            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
+          done
+          PAYLOAD=$(printf '{"text": "日報に更新がありました。\\n%s"}' "${FILE_LINKS}")
+          curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
