@@ -24,5 +24,7 @@ jobs:
               FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
             fi
           done
-          PAYLOAD=$(printf '{"text": "日報に更新がありました。\\n%s"}' "${FILE_LINKS}")
-          curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
+          if [ ! -z "$FILE_LINKS" ]; then
+            PAYLOAD=$(printf '{"text": "柳澤幸一の日報に更新がありました。\\n%s"}' "${FILE_LINKS}")
+            curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
+          fi
