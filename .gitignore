@@ -1,2 +1,2 @@
 .DS_Store
-daily-report/*/*/generate_dailiy_report.sh
+daily-report/*/*/report.sh
