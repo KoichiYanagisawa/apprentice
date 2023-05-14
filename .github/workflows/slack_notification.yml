@@ -21,7 +21,5 @@ jobs:
           for file in $CHANGED_FILES; do
             FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\n"
           done
-          PAYLOAD=$(echo -e "{
-            \"text\": \"更新がありました:\n${FILE_LINKS}\"
-          }")
+          PAYLOAD=$(printf '{"text": "更新がありました:\n%s"}' "${FILE_LINKS}")
           curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
