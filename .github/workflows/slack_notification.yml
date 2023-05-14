@@ -19,7 +19,7 @@ jobs:
           CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA} | grep "daily-report/2023/")
           FILE_LINKS=""
           for file in $CHANGED_FILES; do
-            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\n"
+            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
           done
-          PAYLOAD=$(printf '{"text": "更新がありました:\n%s"}' "${FILE_LINKS}")
+          PAYLOAD=$(printf '{"text": "更新がありました:\\n%s"}' "${FILE_LINKS}")
           curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
