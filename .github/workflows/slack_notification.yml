@@ -1,0 +1,16 @@
+name: Slack Notification
+
+on:
+  push:
+    paths:
+      - "daily-report/2023/**"
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"更新がありました: daily-report/2023"}' $SLACK_WEBHOOK
