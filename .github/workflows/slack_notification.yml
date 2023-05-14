@@ -16,10 +16,13 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run: |
-          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA} | grep "daily-report/2023/")
+          CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r ${GITHUB_SHA})
+          echo "CHANGED_FILES: ${CHANGED_FILES}"
           FILE_LINKS=""
           for file in $CHANGED_FILES; do
-            FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
+            if [[ $file == "daily-report/2023/"* ]]; then
+              FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
+            fi
           done
           PAYLOAD=$(printf '{"text": "日報に更新がありました。\\n%s"}' "${FILE_LINKS}")
           curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
