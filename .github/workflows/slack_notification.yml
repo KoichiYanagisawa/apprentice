@@ -22,7 +22,7 @@ jobs:
           echo "CHANGED_FILES: ${CHANGED_FILES}"
           FILE_LINKS=""
           while read -r status file; do
-            if [[ $status == "D" ]] && [[ $file == "daily-report/2023/"* ]]; then
+            if [[ $status == "M" ]] && [[ $file == "daily-report/2023/"* ]]; then
               FILE_LINKS+="https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_SHA}/${file}\\n"
             fi
           done <<< "$CHANGED_FILES"
