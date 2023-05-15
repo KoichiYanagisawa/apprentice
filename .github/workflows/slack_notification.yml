@@ -27,6 +27,6 @@ jobs:
             fi
           done <<< "$CHANGED_FILES"
           if [ ! -z "$FILE_LINKS" ]; then
-            PAYLOAD=$(printf '{"text": "柳澤幸一の日報に新規ファイルが追加されました。\\n%s"}' "${FILE_LINKS}")
+            PAYLOAD=$(printf '{"text": "【本日の日報】柳澤 幸一\\n%s"}' "${FILE_LINKS}")
             curl -X POST -H 'Content-type: application/json' --data "${PAYLOAD}" $SLACK_WEBHOOK
           fi
