@@ -4,7 +4,7 @@
 
 ### **ステップ1**:テーブル設計
 - [ER図](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/internet_tv.pu)
-<img width="450px" src="https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/ER.png">
+<img alt="リンク切れです。お手数ですがER.pngを開いてご確認ください。" width="450px" src="https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/ER.png">
 
 - [テーブル設計](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/internet_tv.md)
 
