@@ -1,8 +1,17 @@
 # **アプレンティスの取り組み用リポジトリです**
 
 ## それぞれの課題はweekから始まるディレクトリに格納されています。
-week◯◯
-
-  |-practice :こちらは提出不要のクエスト回答が入っています
-
-  |-quest    :こちらは提出クエストの回答が入っています
+- practiceには提出不要クエストの回答が入っています。
+- questには提出クエストの回答が入っています。
+.  
+├── original_product  
+│   └── README.md  
+├── week1-2  
+│   ├── practice  
+│   └── quest  
+├── week3-4  
+│   ├── practice  
+│   └── quest  
+└── week5-6  
+    ├── practice  
+    └── quest  
