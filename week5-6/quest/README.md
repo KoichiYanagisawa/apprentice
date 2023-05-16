@@ -3,15 +3,15 @@
 ## インターネットTVのQUEST回答は以下となります。
 
 ### **ステップ1**:テーブル設計
-- [ER図](/Users/koichi/apprentice/week5-6/quest/internet_tv.pu)
+- [ER図](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/internet_tv.pu)
 
-- [テーブル設計](/Users/koichi/apprentice/week5-6/quest/internet_tv.md)
+- [テーブル設計](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/internet_tv.md)
 
 ### **ステップ2**:テーブル構築とサンプルデータ投入
 
 以下では、SQL文をまとめて実行する手順を示しますが、該当SQL文をコピー&ペーストで１行ずつ実行しても構いません。
 
-1. [internet_tv.sql](/Users/koichi/apprentice/week5-6/quest/internet_tv.sql)をMySQLを実行する環境に移動させます。または、`git clone`をしても構いません。
+1. [internet_tv.sql](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/internet_tv.sql)をMySQLを実行する環境に移動させます。または、`git clone`をしても構いません。
 
 2. `internet_tv.sql`ファイルを配置したディレクトリに移動します。
 
@@ -43,7 +43,7 @@
 
 ### **ステップ3**:データ抽出クエリ
 
-[quest_step3.sql](/Users/koichi/apprentice/week5-6/quest/quest_step3.sql)内のSQL文をまとめて実行する手順を以下に示します。なお、該当のSQL文をコピー&ペーストで１行ずつ実行しても構いません。
+[quest_step3.sql](https://github.com/KoichiYanagisawa/apprentice/blob/main/week5-6/quest/quest_step3.sql)内のSQL文をまとめて実行する手順を以下に示します。なお、該当のSQL文をコピー&ペーストで１行ずつ実行しても構いません。
 
 1. `quest_step3.sql`ファイルを配置したディレクトリに移動します。
 
