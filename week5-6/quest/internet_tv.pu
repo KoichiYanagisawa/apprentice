@@ -62,8 +62,8 @@ entity "program_genres"{
 ' リレーションシップを明示する
 channels ||--o{ program_list
 episodes ||--o{ program_list
-series   ||--o{ seasons
-seasons  ||--o{ episodes
+series   ||--|{ seasons
+seasons  ||--|{ episodes
 program_genres ||--|{ genres
 program_genres ||--|{ program_list
 @enduml

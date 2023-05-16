@@ -1,3 +1,4 @@
+## 複数のチャンネルを表現するテーブル
 テーブル：channels
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -6,6 +7,7 @@
 |channel_name|varchar(100)|||||
 - ユニークキー制約：channel_name カラムに対して設定
 
+## 番組表を表現するテーブル
 テーブル：program_list
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -22,6 +24,7 @@
 - 外部キー制約：episode_idに対して、episodes.episode_idから設定
 - ユニークキー制約：program_list_title カラムに対して設定
 
+## シリーズを表現するテーブル
 テーブル：series
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -30,6 +33,7 @@
 |series_title|varchar(100)|||||
 - ユニークキー制約：series_title カラムに対して設定
 
+## シーズンを表現するテーブル
 テーブル：seasons
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -40,6 +44,7 @@
 |season_title|varchar(100)|||||
 - 外部キー制約：series_idに対して、series.series_idから設定
 
+## エピソードを表現するテーブル
 テーブル：episodes
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -55,6 +60,7 @@
 |file_path|varchar(255)|||||
 - 外部キー制約：season_idに対して、seasons.season_idから設定
 
+## 複数のジャンルを表現するテーブル
 テーブル：genres
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
@@ -63,6 +69,7 @@
 |genre_name|varchar(50)|||||
 - ユニークキー制約：genre_name カラムに対して設定
 
+## 番組表とジャンルの多対多を解消するテーブル
 テーブル：program_genres
 
 |カラム名|データ型|NULL|キー|初期値|AUTO INCREMENT|
