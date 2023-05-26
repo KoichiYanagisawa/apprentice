@@ -57,3 +57,48 @@ function square(numbers) {
 console.log(square([1, 2, 3, 4, 5]));
 
 // オブジェクトを使うことができる
+function printBooks(books) {
+  books.forEach((book) => {
+    console.log(`『${book.book}』${book.name}`);
+  });
+}
+const books = [
+  { name: '山田太郎', book: 'JavaScript入門' },
+  { name: '山田次郎', book: 'JavaScriptの絵本' },
+];
+printBooks(books);
+
+// ユーザーパーミッションチェッカー
+const users = [
+  {
+    username: '山田',
+    permissions: {
+      canRead: true,
+      canWrite: true,
+      canDelete: false,
+    },
+  },
+  {
+    username: '佐藤',
+    permissions: {
+      canRead: false,
+      canWrite: true,
+      canDelete: false,
+    },
+  },
+  // ユーザーを追加してください
+];
+function checkPermission(username, permission) {
+  const result = users.find((user) => user.username === username);
+  return result ? result.permissions[permission] || false : false;
+}
+console.log(checkPermission('山田', 'canWrite'));
+
+// メソッド
+const obj = {
+  method() {
+    console.log('method');
+  },
+};
+
+obj.method();
