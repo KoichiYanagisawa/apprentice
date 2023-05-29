@@ -6,80 +6,71 @@ document.addEventListener('DOMContentLoaded', () => {
   let operatorPressed = false;
 
   display.style.textAlign = 'right';
+  display.textContent = 0;
 
   buttons.addEventListener('click', (event) => {
     if (event.target.classList.contains('operator')) {
-      // フラグ管理
       if (operatorPressed) {
         if (digit.length === operator.length && operator.length !== 0) {
           operator[operator.length - 1] = event.target.textContent;
-          console.log(operator);
         }
+        display.textContent = display.textContent.slice(0, -1) + event.target.textContent;
       } else {
         operatorPressed = true;
-
-        if (digit.length === operator.length && display.textContent !== '') {
-          // 数値を配列に格納
-          digit.push(Number(display.textContent));
-          console.log(digit);
-          // 符号を配列に格納
-          operator.push(event.target.textContent);
-          console.log(operator);
-        }
+        digit.push(Number(display.textContent));
+        operator.push(event.target.textContent);
+        display.textContent += event.target.textContent;
       }
     } else if (event.target.classList.contains('digit')) {
-      // フラグをリセットする
-      // 数値をディスプレイに表示
       const pushDigit = Number(event.target.textContent);
-      if ((pushDigit !== 0 && display.textContent === '') || (display.textContent !== '')) {
-        if (operatorPressed) {
-          operatorPressed = false;
-          display.textContent = '';
-        }
+      if (display.textContent === '0' || operatorPressed || '+-*/'.includes(display.textContent.slice(-1))) {
+        display.textContent = pushDigit;
+        operatorPressed = false;
+      } else {
         display.textContent += pushDigit;
       }
     } else if (event.target.id === 'clear') {
       operatorPressed = false;
-      display.textContent = '';
+      display.textContent = '0';
       digit.length = 0;
       operator.length = 0;
     } else if (event.target.id === 'equals') {
-      console.log('=が押されました');
-      if (operator.length !== 0) {
-        if (display.textContent !== '') {
-          digit.push(Number(display.textContent));
-          console.log(digit);
-        }
-        if (digit.length === operator.length) {
-          operator.pop();
-        }
-        let result = 0;
-        const newArr = digit.map((value, index) => {
-          switch (operator[index]) {
-            case '*':
-              result = digit[index] * digit[index + 1];
-              operator.splice(index, 1);
-              console.log(digit);
-              console.log(operator);
-              return result;
-            case '/':
-              result = digit[index] / digit[index + 1];
-              operator.splice(index, 1);
-              console.log(digit);
-              console.log(operator);
-              return result;
-            default:
-              result = value;
-          }
-          return result;
-        });
-        console.log(newArr);
-        digit.forEach((value) => {
-
-        });
+      if (digit.length !== 0 && operator.length !== 0) {
+        digit.push(Number(display.textContent));
       } else {
-        display.textContent = 0;
+        return;
       }
+      for (let i = 0; i < operator.length; i += 1) {
+        if (operator[i] === '*' || operator[i] === '/') {
+          if (operator[i] === '*') {
+            digit[i] *= digit[i + 1];
+          } else {
+            if (digit[i + 1] === 0) {
+              display.textContent = 'Error';
+              operatorPressed = false;
+              digit.length = 0;
+              operator.length = 0;
+              return;
+            }
+            digit[i] /= digit[i + 1];
+          }
+          digit.splice(i + 1, 1);
+          operator.splice(i, 1);
+          i -= 1;
+        }
+      }
+      let result = digit[0];
+      for (let i = 0; i < operator.length; i += 1) {
+        if (operator[i] === '+') {
+          result += digit[i + 1];
+        } else if (operator[i] === '-') {
+          result -= digit[i + 1];
+        }
+      }
+      display.textContent = result.toFixed(2);
+      operatorPressed = false;
+      digit.length = 0;
+      operator.length = 0;
     }
   });
 });
