@@ -12,8 +12,10 @@
   - 使用割合は、LINE 通話と LINE トークが 8 割、電話 2 割。
 - iPhone ケースを買いたいが、どこに「型名」や買いたい「ケースの種類・形状」を入力すれば良いのかがわからない課題を解決したい。
 - 検索条件不足で、別の型のケースが検索結果に出てこないようにしたい。
+
   - そもそもどのような検索条件で調べれば良いのかがわからない。
   - iPhone13 Pro のケースを買いたかったが、Pro というワードが抜けていたため iPhone13 のケースがヒットしていることに気付かず購入。
+
     <img src="https://github.com/KoichiYanagisawa/apprentice/blob/main/original_product/IMG_0414.jpeg" alt="iPhone13Proのケースを買いたかったが・・・？" width="400px" />
 
 ## 3.なぜそれを解決したいのか？
